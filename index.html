@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Ruiz Rodas - Reaction Path</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>David Ruiz Rodas - PES Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #02040a;       
-            --card-bg: rgba(10, 15, 30, 0.7); /* Muy transparente para ver el 3D */
+            --bg-dark: #050505;       
+            --card-bg: rgba(20, 20, 25, 0.6); 
             --text-main: #f1f5f9;     
             --text-muted: #94a3b8;    
-            --accent: #00f2ff; /* Cyan más eléctrico */
+            --accent: #00f2ff;
         }
 
+        html { scroll-behavior: smooth; } /* Suaviza el salto al hacer clic en el menú */
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
@@ -26,158 +28,185 @@
             overflow-x: hidden;
         }
 
-        /* EL LIENZO 3D FIJO AL FONDO */
+        /* LIENZO 3D */
         #canvas-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Detrás del texto */
-            background: radial-gradient(circle at center, #0b1021 0%, #000000 100%);
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
         }
 
-        /* CONTENEDOR PRINCIPAL */
-        .main-content {
+        /* BARRA DE NAVEGACIÓN (NUEVO) */
+        .nav-dock {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px 10px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
             position: relative;
-            z-index: 1;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            transform: scale(1.3);
+        }
+
+        /* Tooltip del menú (El texto que sale al pasar el ratón) */
+        .nav-btn::before {
+            content: attr(data-label);
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            color: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            border: 1px solid var(--accent);
+        }
+
+        .nav-btn:hover::before { opacity: 1; }
+
+        /* CONTENIDO PRINCIPAL */
+        .main-content {
             max-width: 900px;
             margin: 0 auto;
             padding: 0 20px;
-            /* Espacio extra arriba y abajo para el "viaje" */
-            padding-top: 15vh;
-            padding-bottom: 20vh;
         }
 
-        /* HEADER */
+        /* SECCIONES */
+        section {
+            min-height: 80vh; /* Cada sección ocupa casi toda la pantalla */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 50px;
+        }
+
         header {
-            margin-bottom: 150px; /* Mucho espacio para ver la PES al principio */
-            text-align: center;
+            min-height: 90vh; /* La portada ocupa toda la pantalla */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
         }
 
         h1 {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 3.5rem;
+            font-size: 4rem;
             margin: 0;
-            text-shadow: 0 0 25px rgba(0, 242, 255, 0.5);
-            letter-spacing: -2px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .role {
-            color: var(--accent);
             font-family: 'JetBrains Mono';
-            font-size: 1.2rem;
+            color: var(--accent);
+            font-size: 1.3rem;
             margin-top: 10px;
-            display: inline-block;
-            background: rgba(0, 242, 255, 0.1);
-            padding: 5px 15px;
-            border-radius: 4px;
-            border: 1px solid rgba(0, 242, 255, 0.3);
-        }
-
-        /* SECCIONES FLOTANTES */
-        section {
-            margin-bottom: 200px; /* Separación amplia para que haya "viaje" entre secciones */
-            opacity: 0; /* Animación de entrada */
-            transform: translateY(30px);
-            transition: all 0.8s ease-out;
-        }
-
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         h2 {
             font-family: 'JetBrains Mono', monospace;
             color: var(--accent);
             font-size: 2rem;
-            margin-bottom: 30px;
-            border-left: 4px solid var(--accent);
-            padding-left: 20px;
+            margin-bottom: 40px;
+            display: inline-block;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
         }
 
-        /* TARJETAS DE CRISTAL */
+        /* TARJETAS GLASS */
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(5px); /* Desenfoque suave */
+            backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 30px;
+            padding: 35px;
             border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-
-        .item-title { font-weight: 700; font-size: 1.2rem; color: #fff; }
-        .item-place { color: var(--accent); font-family: 'JetBrains Mono'; font-size: 0.9rem;} 
-        .item-date { color: var(--text-muted); font-size: 0.9rem; }
-
-        /* SKILLS BARS & TAGS */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .skill-bar-container { margin-bottom: 15px; }
-        .sb-info { display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 0.85rem; margin-bottom: 5px; }
-        .sb-bg { background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; }
-        .sb-fill { background: var(--accent); height: 100%; border-radius: 3px; width: 0; transition: width 1s ease; }
-
-        .tags { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-        .tags li {
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            background: rgba(0, 242, 255, 0.05);
-        }
-
-        /* FOOTER */
-        footer {
-            text-align: center;
-            padding-bottom: 50px;
+            margin-bottom: 25px;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
         }
         
-        .profile-pic {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--accent);
-            object-fit: cover;
-            margin-bottom: 20px;
+        /* Borde superior de color */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--accent), transparent);
         }
 
+        .glass-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.3); }
+
+        .item-header {
+            display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 15px;
+        }
+        .item-title { font-weight: 700; font-size: 1.3rem; color: #fff; }
+        .item-place { color: #cbd5e1; font-style: italic; }
+        .item-date { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 0.9rem; }
+
+        /* SKILLS */
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; }
+        .skill-group h3 { margin-top: 0; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px;}
+        
+        .tags { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; }
+        .tags li {
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono';
+            transition: 0.2s;
+        }
+        .tags li:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); color: var(--accent); }
+
+        /* FOOTER */
+        footer { text-align: center; padding-bottom: 50px; padding-top: 50px;}
+        .profile-pic { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 20px; }
         .contact-btn {
-            background: var(--accent);
-            color: #000;
-            font-weight: bold;
-            padding: 15px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: transform 0.2s;
-            display: inline-block;
+            background: var(--accent); color: #000; font-weight: bold; padding: 15px 40px; border-radius: 50px; text-decoration: none; display: inline-block; transition: 0.3s;
         }
-        .contact-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--accent); }
+        .contact-btn:hover { box-shadow: 0 0 25px var(--accent); }
 
-        /* Social Links */
-        .social-bar { margin-top: 20px; display: flex; justify-content: center; gap: 20px; }
-        .social-link { color: var(--text-muted); text-decoration: none; font-family: 'JetBrains Mono'; font-size: 0.9rem; border-bottom: 1px solid transparent; transition: all 0.3s; }
-        .social-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+        /* Social Icons */
+        .social-bar { margin-top: 30px; display: flex; gap: 20px; }
+        .social-icon { color: #94a3b8; text-decoration: none; font-size: 0.9rem; border: 1px solid #334155; padding: 8px 16px; border-radius: 5px; transition: 0.3s; }
+        .social-icon:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 242, 255, 0.1); }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            section { margin-bottom: 100px; }
+            h1 { font-size: 2.8rem; }
+            .nav-dock { display: none; } /* Ocultar nav lateral en móvil */
         }
     </style>
 </head>
@@ -185,236 +214,263 @@
 
     <div id="canvas-container"></div>
 
+    <nav class="nav-dock">
+        <a href="#home" class="nav-btn active" data-label="Reactants (Intro)"></a>
+        <a href="#education" class="nav-btn" data-label="Path (Education)"></a>
+        <a href="#experience" class="nav-btn" data-label="Transition State (Exp)"></a>
+        <a href="#skills" class="nav-btn" data-label="Parameters (Skills)"></a>
+        <a href="#contact" class="nav-btn" data-label="Products (Contact)"></a>
+    </nav>
+
     <div class="main-content">
         
-        <header>
+        <header id="home">
             <h1>David Ruiz Rodas</h1>
             <div class="role">~/Computational_Chemist</div>
-            <p style="margin-top: 20px; font-style: italic; color: #aaa;">
-                "Exploring the Potential Energy Surface of Science and Code."
+            <p style="font-size: 1.1rem; color: #cbd5e1; max-width: 600px; margin-top: 20px;">
+                Specialized in <strong>Quantum Mechanics</strong>, Machine Learning Potentials & Spectroscopy.
+                <br><br>
+                <em style="color: var(--text-muted); font-size: 0.9rem;">
+                    "Nature isn't classical, dammit... make it quantum mechanical." — R. Feynman
+                </em>
             </p>
             <div class="social-bar">
-                <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="social-link">LinkedIn</a>
-                <a href="https://github.com/linustroval" target="_blank" class="social-link">GitHub</a>
+                <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="social-icon">LinkedIn</a>
+                <a href="https://github.com/linustroval" target="_blank" class="social-icon">GitHub</a>
             </div>
         </header>
 
-        <section class="scroll-trigger">
-            <h2>01. Reaction Coordinates (Education)</h2>
-            <div class="glass-card">
-                <div class="item-header">
-                    <div>
-                        <div class="item-title">MSc Theoretical Chemistry & Modeling</div>
-                        <div class="item-place">Universidad Autónoma de Madrid</div>
-                    </div>
-                    <div class="item-date">2024 - Present</div>
-                </div>
-                <div>Status: Calculating...</div>
-            </div>
-
-            <div class="glass-card">
-                <div class="item-header">
-                    <div>
-                        <div class="item-title">BSc in Chemistry</div>
-                        <div class="item-place">Universidad Autónoma de Madrid</div>
-                    </div>
-                    <div class="item-date">2020 - 2024</div>
-                </div>
-                <div>Average Grade: 6.82 / 10 | 240 Credits</div>
-            </div>
-        </section>
-
-        <section class="scroll-trigger">
-            <h2>02. Interaction Energy (Experience)</h2>
-            <div class="glass-card">
-                <div class="item-header">
-                    <div>
-                        <div class="item-title">Undergraduate Researcher (TFG)</div>
-                        <div class="item-place">IFF-CSIC</div>
-                    </div>
-                    <div class="item-date">2024</div>
-                </div>
-                <p>
-                    Analyzed <strong>Noble Gas Spectroscopy</strong>. Developed kernel-based machine learned potentials and performed quantum computations.
-                </p>
-                <div style="margin-top: 15px; color: var(--accent); font-size: 0.9rem;">
-                    Publications: "Spectroscopic characterization of proton-bound Kr2H+ molecule" (In Prep).
-                </div>
-            </div>
+        <section id="education">
+            <h2>01. Reaction Coordinates</h2>
             
             <div class="glass-card">
                 <div class="item-header">
-                    <div>
-                        <div class="item-title">STEM Private Tutor</div>
-                        <div class="item-place">Freelance</div>
-                    </div>
+                    <div class="item-title">MSc Theoretical Chemistry & Modeling</div>
+                    <div class="item-date">2024 - Present</div>
+                </div>
+                <div class="item-place">Universidad Autónoma de Madrid</div>
+                <div style="margin-top: 10px; font-size: 0.9rem; color: #a5b4fc;">Status: In Progress</div>
+            </div>
+
+            <div class="glass-card">
+                <div class="item-header">
+                    <div class="item-title">BSc in Chemistry</div>
+                    <div class="item-date">2020 - 2024</div>
+                </div>
+                <div class="item-place">Universidad Autónoma de Madrid</div>
+                <div style="margin-top: 10px;">Avg Grade: 6.82 | 240 Credits</div>
+            </div>
+        </section>
+
+        <section id="experience">
+            <h2>02. Energy Barriers</h2>
+            
+            <div class="glass-card">
+                <div class="item-header">
+                    <div class="item-title">Undergraduate Researcher (TFG)</div>
+                    <div class="item-date">2024</div>
+                </div>
+                <div class="item-place">Institute of Fundamental Physics (IFF-CSIC)</div>
+                <p>
+                    Analyzed <strong>Noble Gas Spectroscopy</strong>. Developed kernel-based machine learned potentials and performed quantum computations.
+                </p>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(0, 242, 255, 0.05); border-left: 3px solid var(--accent); font-size: 0.9rem;">
+                    <strong>Publication (In Prep):</strong> "Spectroscopic characterization of proton-bound Kr2H+ molecule"
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="item-header">
+                    <div class="item-title">STEM Private Tutor</div>
                     <div class="item-date">2020 - Present</div>
                 </div>
+                <p>Teaching Mathematics, Physics, and Chemistry (ESO/Bachillerato).</p>
             </div>
         </section>
 
-        <section class="scroll-trigger">
-            <h2>03. Basis Set (Skills)</h2>
-            <div class="glass-card skills-grid">
-                <div>
-                    <h3 style="margin-top:0; color:#fff;">Code</h3>
-                    <div class="skill-bar-container">
-                        <div class="sb-info"><span>Fortran</span><span>4/5</span></div>
-                        <div class="sb-bg"><div class="sb-fill" style="width: 80%"></div></div>
-                    </div>
-                    <div class="skill-bar-container">
-                        <div class="sb-info"><span>Bash/Shell</span><span>4/5</span></div>
-                        <div class="sb-bg"><div class="sb-fill" style="width: 80%"></div></div>
-                    </div>
-                    <div class="skill-bar-container">
-                        <div class="sb-info"><span>Python</span><span>3/5</span></div>
-                        <div class="sb-bg"><div class="sb-fill" style="width: 60%"></div></div>
-                    </div>
-                    <div class="skill-bar-container">
-                        <div class="sb-info"><span>C</span><span>1/5</span></div>
-                        <div class="sb-bg"><div class="sb-fill" style="width: 20%"></div></div>
-                    </div>
+        <section id="skills">
+            <h2>03. Input Parameters</h2>
+            <div class="skills-grid">
+                
+                <div class="skill-group">
+                    <h3>Programming</h3>
+                    <ul class="tags">
+                        <li style="border-color: #4ade80; color: #4ade80;">Fortran (4/5)</li>
+                        <li style="border-color: #4ade80; color: #4ade80;">Bash (4/5)</li>
+                        <li style="border-color: #facc15; color: #facc15;">Python (3/5)</li>
+                        <li style="border-color: #f87171; color: #f87171;">C (1/5)</li>
+                    </ul>
                 </div>
 
-                <div>
-                    <h3 style="margin-top:0; color:#fff;">Tools</h3>
+                <div class="skill-group">
+                    <h3>Comp. Chemistry</h3>
                     <ul class="tags">
                         <li>Gaussian</li> <li>Orca</li> <li>Molpro</li>
-                        <li>Spartan</li> <li>Molden</li> <li>Gnuplot</li>
-                        <li>LaTeX</li> <li>Git</li>
-                    </ul>
-                    
-                    <h3 style="margin-top:20px; color:#fff;">Languages</h3>
-                    <ul class="tags">
-                        <li>Spanish (Native)</li> <li>English (B2)</li>
+                        <li>Spartan</li> <li>Molden</li>
                     </ul>
                 </div>
-            </div>
-        </section>
 
-        <section class="scroll-trigger">
-            <h2>04. Data Input (Seminars)</h2>
-            <div class="glass-card">
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 15px; border-bottom: 1px dashed #333; padding-bottom: 10px;">
-                        <strong style="color: #fff;">Thesis Attendance (2024):</strong> "Big data in quantum astrochemistry" (UAM).
-                    </li>
-                    <li>
-                        <strong style="color: #fff;">Seminar (2024):</strong> "Complex organic molecules in the interstellar medium" (IFF-CSIC).
-                    </li>
+                <div class="skill-group">
+                    <h3>Data Tools</h3>
+                    <ul class="tags">
+                        <li>LaTeX</li> <li>Gnuplot</li> <li>OriginLab</li> <li>Git</li>
+                    </ul>
+                </div>
+
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <h3 style="color: #fff; font-family: 'JetBrains Mono';">Seminars & Learning</h3>
+                <ul style="color: #cbd5e1; list-style: circle; margin-left: 20px; line-height: 1.8;">
+                    <li><strong>Big data in quantum astrochemistry</strong> (UAM, 2024)</li>
+                    <li><strong>Complex organic molecules in ISM</strong> (IFF-CSIC, 2024)</li>
                 </ul>
             </div>
         </section>
 
-        <footer class="scroll-trigger">
+        <footer id="contact">
             <img src="profile.jpg" alt="David" class="profile-pic">
-            <h2 style="border: none; margin-bottom: 10px; padding: 0;">Ready to Collaborate?</h2>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Let's calculate the next big solution together.</p>
+            <h2 style="border: none; margin-bottom: 20px;">Equilibrium Reached</h2>
+            <p style="color: #94a3b8; margin-bottom: 30px;">Let's calculate the next solution together.</p>
             <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Initialize Contact</a>
         </footer>
+
     </div>
 
     <script>
-        // CONFIGURACIÓN INICIAL
         const scene = new THREE.Scene();
-        // Niebla para que el fondo se difumine (profundidad)
-        scene.fog = new THREE.FogExp2(0x02040a, 0.002);
+        // Fondo oscuro pero con un toque azul profundo
+        scene.fog = new THREE.FogExp2(0x050505, 0.0025);
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // CREAR LA PES (SUPERFICIE)
-        // Usamos PlaneGeometry con muchos segmentos para que se vea suave
-        const geometry = new THREE.PlaneGeometry(200, 200, 60, 60);
+        // --- CREAR LA PES GIGANTE ---
+        // Width: 200, Height (Deep): 800 (Mucho más largo para que no se acabe)
+        const geometry = new THREE.PlaneGeometry(200, 800, 80, 200);
         
-        // Modificar los vértices para crear "montañas" (La PES)
         const count = geometry.attributes.position.count;
-        const positions = geometry.attributes.position; // Array con las coordenadas x,y,z
+        const positions = geometry.attributes.position;
+        
+        // Array para guardar los colores de cada vértice
+        const colors = [];
+        const color = new THREE.Color();
 
         for (let i = 0; i < count; i++) {
             const x = positions.getX(i);
             const y = positions.getY(i);
             
-            // Fórmula matemática para simular energía: mezcla de senos y cosenos
-            // Esto crea los picos y valles
-            const z = (Math.sin(x / 10) * Math.cos(y / 10) * 10) + (Math.sin(x / 20) * 5);
+            // ECUACIÓN DE LA PES:
+            // Combinación de ondas para crear valles y picos
+            // Z es la altura en Three.js por defecto para el plano, pero luego lo rotamos.
+            let z = (Math.sin(x * 0.05) * Math.cos(y * 0.05) * 8) + 
+                    (Math.sin(x * 0.1 + y * 0.1) * 4);
             
+            // Añadir ruido aleatorio pequeño (rugosidad de la superficie)
+            z += Math.random() * 0.5;
+
             positions.setZ(i, z);
+
+            // --- MAPA DE CALOR (HEATMAP) ---
+            // Normalizamos la altura para elegir color
+            // Si z es bajo (-10) -> Azul. Si z es alto (+10) -> Rojo.
+            const minZ = -12;
+            const maxZ = 12;
+            let t = (z - minZ) / (maxZ - minZ); // Valor entre 0 y 1
+            
+            // Usamos HSL para el gradiente científico
+            // H: 0.7 (Azul) -> 0.0 (Rojo)
+            // S: 1.0 (Saturación total)
+            // L: 0.5 (Luminosidad media)
+            color.setHSL(0.7 - (t * 0.7), 1.0, 0.5);
+            
+            colors.push(color.r, color.g, color.b);
         }
         
+        // Añadimos los colores a la geometría
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
         geometry.computeVertexNormals();
 
-        // Material estilo "Wireframe" (Malla de alambre) Cyberpunk
+        // Material Wireframe que usa los colores de los vértices (Vertex Colors)
         const material = new THREE.MeshBasicMaterial({ 
-            color: 0x00f2ff, 
+            vertexColors: true, // ¡IMPORTANTE! Esto activa el mapa de calor
             wireframe: true,
             transparent: true,
-            opacity: 0.3
+            opacity: 0.5
         });
 
         const plane = new THREE.Mesh(geometry, material);
-        
-        // Rotamos el plano para que parezca un suelo infinito
-        plane.rotation.x = -Math.PI / 2; 
+        plane.rotation.x = -Math.PI / 2; // Acostar el plano
+        // Movemos el plano un poco hacia "atrás" en el eje Z para empezar en el borde
+        plane.position.z = -100; 
         scene.add(plane);
 
-        // POSICIÓN INICIAL DE LA CÁMARA
-        camera.position.set(0, 15, 60); // (x, altura, profundidad)
-        camera.lookAt(0, 0, 0);
+        // Posición inicial de la cámara
+        camera.position.set(0, 20, 100);
 
-        // FUNCIÓN DE ANIMACIÓN (SCROLL)
+        // --- MOVIMIENTO DE CÁMARA Y SCROLL ---
         function moveCamera() {
-            // Calculamos cuánto ha bajado el usuario en %
-            const t = document.body.getBoundingClientRect().top;
+            // Obtenemos qué tan abajo estamos en la página (en píxeles)
+            const scrollY = window.scrollY;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
             
-            // Movemos la cámara hacia adelante a medida que baja el scroll
-            // 't' es negativo cuando bajas, así que multiplicamos por un factor pequeño
-            camera.position.z = 60 + (t * 0.1); 
-            camera.position.y = 15 + (t * 0.02); // Baja un poco la cámara también
+            // Porcentaje de scroll (0 a 1)
+            const scrollPercent = scrollY / docHeight;
+
+            // Mover la cámara a lo largo del plano
+            // Empieza en Z=100 y va bajando hacia dentro de la pantalla
+            // Ajustamos el factor (multiplier) para que recorra todo el plano largo
+            camera.position.z = 100 - (scrollY * 0.15); 
             
-            // Rotación sutil para dar sensación de vuelo
-            camera.rotation.z = t * 0.0002;
+            // Mover la cámara un poco arriba/abajo siguiendo el terreno (opcional)
+            camera.position.y = 20 + Math.sin(scrollY * 0.005) * 5;
+
+            // Rotar sutilmente
+            camera.rotation.z = scrollY * 0.0002;
+            
+            // Actualizar botones del menú
+            updateActiveNav();
         }
 
-        // BUCLE DE RENDERIZADO
+        function updateActiveNav() {
+            const sections = document.querySelectorAll('section, header, footer');
+            const navBtns = document.querySelectorAll('.nav-btn');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= (sectionTop - 300)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('href').includes(current)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // --- ANIMACIÓN ---
         function animate() {
             requestAnimationFrame(animate);
-            
-            // Animación suave de las ondas (Vibración molecular)
-            // Esto hace que la malla se mueva un poquito aunque no hagas scroll
-            const time = Date.now() * 0.0005;
-            const positions = geometry.attributes.position;
-            
-            // Movemos ligeramente solo algunos vértices para efecto "vivo"
-            // (Nota: modificar vértices en tiempo real consume recursos, lo hacemos sutil)
-            
+            // Sutil movimiento "vivo" de la malla (Vibración)
+            plane.position.x = Math.sin(Date.now() * 0.0005) * 2;
             renderer.render(scene, camera);
         }
 
-        // LISTENERS
-        document.body.onscroll = moveCamera;
+        window.addEventListener('scroll', moveCamera);
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-        
-        // Animación de aparición de secciones
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.scroll-trigger').forEach((el) => observer.observe(el));
 
         animate();
-        moveCamera(); // Posición inicial
 
     </script>
 </body>
