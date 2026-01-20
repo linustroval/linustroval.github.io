@@ -45,7 +45,7 @@
             object-fit: cover;
             border: 4px solid var(--primary-color);
             margin-bottom: 15px;
-            background-color: #e2e8f0; /* Color de fondo mientras no hay foto */
+            background-color: #e2e8f0; 
         }
 
         h1 {
@@ -61,6 +61,37 @@
             margin-top: 5px;
         }
 
+        /* SOCIAL LINKS */
+        .social-links {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #334155;
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .social-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: #eff6ff;
+            transform: translateY(-2px);
+        }
+
         /* SECTIONS */
         section { margin-bottom: 35px; }
 
@@ -71,7 +102,7 @@
             margin-bottom: 20px;
         }
 
-        /* ITEMS (Education/Experience) */
+        /* ITEMS */
         .item { margin-bottom: 25px; }
         
         .item-title {
@@ -92,11 +123,12 @@
             margin-bottom: 8px;
         }
 
-        /* SKILLS & TAGS */
+        /* SKILLS */
         .skills-category {
             margin-bottom: 10px;
             font-weight: bold;
             display: block;
+            margin-top: 15px;
         }
 
         .skills {
@@ -105,7 +137,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .skills li {
@@ -125,24 +157,25 @@
             border-left: 3px solid #94a3b8;
         }
 
-        /* CONTACT BTN */
-        .contact-btn {
+        /* CONTACT FOOTER */
+        .contact-footer-btn {
             display: inline-block;
             background-color: var(--primary-color);
             color: white;
-            padding: 12px 25px;
+            padding: 12px 30px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: 600;
-            margin-top: 10px;
             transition: background 0.3s;
         }
         
-        .contact-btn:hover { background-color: #1d4ed8; }
+        .contact-footer-btn:hover { background-color: #1d4ed8; }
 
         @media (max-width: 600px) {
             .container { margin: 0; padding: 25px; border-radius: 0; }
             h1 { font-size: 2rem; }
+            .social-links { flex-direction: column; align-items: center; }
+            .social-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -155,6 +188,15 @@
             <h1>David Ruiz Rodas</h1>
             <div class="subtitle">Chemist & Computational Researcher</div>
             <p>📍 Madrid, Spain | 📧 rrodasdavid@gmail.com</p>
+
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="social-btn">
+                    🔗 LinkedIn Profile
+                </a>
+                <a href="https://github.com/linustroval" target="_blank" class="social-btn">
+                    💻 GitHub / linustroval
+                </a>
+            </div>
         </header>
 
         <section>
@@ -179,7 +221,7 @@
                 <div class="item-title">BSc in Chemistry</div>
                 <div class="item-subtitle">Universidad Autónoma de Madrid (UAM)</div>
                 <span class="date">2020 - 2024</span>
-                <p>Credits passed: 240. Note: 6.82</p>
+                <p>Average Grade: 6.82 | Credits completed: 240</p>
             </div>
         </section>
 
@@ -206,7 +248,7 @@
                 <div class="item-title">Private Tutor</div>
                 <div class="item-subtitle">High School Level (ESO/Bachillerato)</div>
                 <span class="date">2020 - Present</span>
-                <p>Teaching science subjects and mathematics, adapting communication skills to different learning levels.</p>
+                <p>Teaching science subjects and mathematics.</p>
             </div>
 
             <div class="item">
@@ -253,8 +295,8 @@
         </section>
 
         <section style="text-align: center; margin-top: 50px;">
-            <p>Looking for a researcher for your computational chemistry project?</p>
-            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Contact Me</a>
+            <p>Looking for a researcher?</p>
+            <a href="mailto:rrodasdavid@gmail.com" class="contact-footer-btn">Contact Me</a>
         </section>
     </div>
 
