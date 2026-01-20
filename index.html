@@ -3,81 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Ruiz Rodas - Reaction Map</title>
+    <title>David Ruiz Rodas - Horizon Flight</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #050505;       
-            --card-bg: rgba(10, 15, 30, 0.85);
+            --bg-dark: #020202;       
+            --card-bg: rgba(5, 10, 20, 0.9);
             --text-main: #ffffff;     
             --text-muted: #94a3b8;    
-            --accent: #06b6d4;
-            --accent-glow: rgba(6, 182, 212, 0.4);
+            --accent: #00f2ff;
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden; /* Ocultar scroll horizontal */
+            overflow-x: hidden;
         }
 
         /* LIENZO 3D */
         #canvas-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #0f172a 0%, #000000 100%);
+            /* Degradado más oscuro para simular horizonte profundo */
+            background: linear-gradient(to bottom, #020205 0%, #101525 100%);
         }
 
-        /* ETIQUETAS FLOTANTES EN EL MUNDO 3D (TITULOS DE MONTAÑA) */
-        .world-label {
-            position: absolute;
-            top: 0; left: 0;
-            transform: translate(-50%, -50%);
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            color: var(--accent);
-            background: rgba(0,0,0,0.6);
-            padding: 8px 15px;
-            border: 1px solid var(--accent);
-            border-radius: 4px;
-            pointer-events: auto; /* Para poder hacer click */
-            cursor: pointer;
-            transition: 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-        .world-label:hover {
-            background: var(--accent);
-            color: #000;
-            transform: translate(-50%, -50%) scale(1.1);
-            z-index: 100;
-        }
+        /* SCROLL DUMMY (Invisible) */
+        #scroll-dummy { height: 6000px; }
 
-        /* CONTENEDOR DE SCROLL "FANTASMA" */
-        /* Hacemos la página muy larga para tener espacio de scroll, 
-           pero el contenido real está fijo y aparece/desaparece */
-        #scroll-dummy {
-            height: 5000px; /* Longitud del viaje */
-        }
-
-        /* PANELES DE INFORMACIÓN (Los que aparecen al llegar) */
+        /* PANELES DE INFORMACIÓN (Aparecen al llegar) */
         .info-panel {
             position: fixed;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0.95);
             width: 90%; max-width: 850px;
-            max-height: 80vh;
-            overflow-y: auto; /* Scroll interno si el texto es muy largo */
+            max-height: 85vh;
+            overflow-y: auto;
             opacity: 0;
-            pointer-events: none; /* No molestar cuando invisibles */
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: 10;
         }
 
@@ -87,102 +55,89 @@
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* ESTILOS DE LAS TARJETAS (Glass) */
+        /* ESTILOS DE TARJETAS */
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 255, 0.15);
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border-radius: 16px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9);
         }
 
-        /* ESTILOS HERO (INICIO) */
-        .hero-panel {
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 4.5rem; font-weight: 800; margin: 0;
+        /* HERO STYLES */
+        .hero-title {
+            font-size: 4rem; font-weight: 800; margin: 0;
             background: linear-gradient(to right, #fff, #94a3b8);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
         }
-        .role { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 1.5rem; margin-top: 10px; }
         .quote {
-            margin: 25px auto; font-family: 'JetBrains Mono'; font-style: italic; color: #cbd5e1;
-            border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 15px 0; max-width: 700px;
+            margin: 20px auto; font-family: 'JetBrains Mono'; font-style: italic; color: #cbd5e1;
+            border-left: 3px solid var(--accent); padding-left: 15px; text-align: left; max-width: 600px;
         }
-        .quote span { color: var(--accent); font-weight: bold; font-style: normal; }
 
-        /* BOTONES HERO */
-        .hero-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
-        .hero-btn {
-            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2);
-            color: #fff; text-decoration: none; font-family: 'JetBrains Mono'; font-weight: 600;
-            padding: 12px 30px; border-radius: 8px; transition: 0.3s;
-        }
-        .hero-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(6, 182, 212, 0.1); }
-
-        /* ESTILOS GENERALES CONTENIDO */
-        h2 { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-top: 0; }
-        .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        /* GENERAL CONTENT */
+        h2 { color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-top: 0; font-family: 'JetBrains Mono'; }
+        .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; }
         .item-title { font-weight: 700; font-size: 1.2rem; color: #fff; }
-        .item-place { color: var(--accent); font-weight: 500; }
-        .item-date { font-family: 'JetBrains Mono'; color: #94a3b8; font-size: 0.9rem; }
+        .item-place { color: #38bdf8; font-weight: 500; }
         
-        /* SKILLS BARS */
+        /* SKILLS */
         .skill-item { margin-bottom: 15px; }
-        .skill-text { display: flex; justify-content: space-between; color: #e2e8f0; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; }
-        .skill-bg { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; }
-        .skill-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #3b82f6); border-radius: 4px; }
-
-        /* TAGS */
+        .skill-bar-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+        .skill-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; box-shadow: 0 0 10px var(--accent); }
         .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; }
-        .tags li { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; }
-        
-        /* INDICADOR DE SCROLL */
-        .scroll-indicator {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            color: var(--text-muted); font-family: 'JetBrains Mono'; font-size: 0.8rem;
-            animation: bounce 2s infinite; opacity: 0.7; z-index: 20;
-        }
-        @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
+        .tags li { border: 1px solid rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 4px; font-size: 0.85rem; color: #cbd5e1; }
 
-        /* FOOTER ESTILO */
-        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 20px; }
-        .contact-btn { background: var(--accent); color: #000; font-weight: 700; padding: 12px 30px; border-radius: 30px; text-decoration: none; display: inline-block; transition: 0.3s; margin-top: 20px;}
-        .contact-btn:hover { box-shadow: 0 0 20px var(--accent); transform: scale(1.05); }
+        /* INDICADOR */
+        .scroll-indicator {
+            position: fixed; bottom: 40px; width: 100%; text-align: center;
+            color: var(--accent); font-family: 'JetBrains Mono'; font-size: 0.9rem;
+            animation: pulse 2s infinite; pointer-events: none; z-index: 5;
+            text-shadow: 0 0 10px var(--accent);
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        /* BOTONES */
+        .hero-btn {
+            display: inline-block; padding: 10px 25px; margin: 10px;
+            border: 1px solid var(--accent); color: var(--accent); text-decoration: none;
+            font-family: 'JetBrains Mono'; border-radius: 4px; transition: 0.3s;
+        }
+        .hero-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent); }
+
+        /* CSS PARA EL TEXTO 3D (Se usará como textura) */
+        /* No visible en el DOM, solo para crear texturas si fuera necesario, pero usaremos Canvas API */
+
+        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; }
 
     </style>
 </head>
 <body>
 
     <div id="canvas-container"></div>
-    
-    <div id="labels-container"></div>
-
     <div id="scroll-dummy"></div>
-
-    <div class="scroll-indicator">SCROLL TO EXPLORE THE MAP ↓</div>
+    <div class="scroll-indicator">SCROLL TO FLY ▾</div>
 
     <div class="info-panel active" id="panel-home">
-        <div class="glass-card hero-panel">
-            <h1>David Ruiz Rodas</h1>
-            <div class="role">Computational Chemist</div>
+        <div class="glass-card" style="text-align: center;">
+            <h1 class="hero-title">David Ruiz Rodas</h1>
+            <div style="color:var(--accent); font-family: 'JetBrains Mono'; margin-top: 10px; font-size: 1.2rem;">
+                Computational Chemist & Researcher
+            </div>
             
             <div class="quote">
-                "Nature isn't classical, dammit, and if you want to make a simulation of nature, you'd better make it quantum mechanical."
-                <br><span>— Richard Feynman</span>
+                "Nature isn't classical, dammit... make it quantum mechanical." 
+                <br><span style="color:#fff; font-size: 0.9rem;">— Richard Feynman</span>
             </div>
 
-            <p style="color: #cbd5e1; font-size: 1.1rem; margin-bottom: 30px;">
-                Navigate through the <strong>Potential Energy Surface</strong> of my professional career.
-                <br><span style="font-size: 0.9rem; color: var(--accent);">(Scroll down or click the mountain peaks)</span>
+            <p style="color: #94a3b8; max-width: 600px; margin: 20px auto;">
+                Welcome to my <strong>Potential Energy Surface</strong>. <br>
+                Scroll to navigate through the energy barriers of my career.
             </p>
 
-            <div class="hero-buttons">
+            <div>
                 <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="hero-btn">LinkedIn</a>
                 <a href="https://github.com/linustroval" target="_blank" class="hero-btn">GitHub</a>
             </div>
@@ -191,80 +146,64 @@
 
     <div class="info-panel" id="panel-education">
         <div class="glass-card">
-            <h2>01. Education Peak</h2>
+            <h2>EDUCATION</h2>
             <div class="item-header">
-                <div class="item-title">MSc Theoretical Chemistry & Modeling</div>
-                <div class="item-date">2024 - Present</div>
+                <span class="item-title">MSc Theoretical Chemistry & Modeling</span>
+                <span style="color: var(--accent);">In Progress</span>
             </div>
-            <div class="item-place">Universidad Autónoma de Madrid</div>
-            <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--accent);">Status: In Progress</div>
+            <div class="item-place">Universidad Autónoma de Madrid (2024-Present)</div>
+            
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
 
             <div class="item-header">
-                <div class="item-title">BSc in Chemistry</div>
-                <div class="item-date">2020 - 2024</div>
+                <span class="item-title">BSc in Chemistry</span>
+                <span style="color: #94a3b8;">2020-2024</span>
             </div>
             <div class="item-place">Universidad Autónoma de Madrid</div>
-            <p style="color: #cbd5e1; font-size: 0.9rem;">
-                Average Grade: 6.82 / 10 | Credits: 240
-            </p>
+            <p style="color: #ccc; font-size: 0.9rem;">Avg Grade: 6.82 | Credits: 240</p>
         </div>
     </div>
 
     <div class="info-panel" id="panel-experience">
         <div class="glass-card">
-            <h2>02. Experience Range</h2>
+            <h2>EXPERIENCE</h2>
             <div class="item-header">
-                <div class="item-title">Undergraduate Researcher (TFG)</div>
-                <div class="item-date">2024</div>
+                <span class="item-title">Undergraduate Researcher (TFG)</span>
+                <span style="color: var(--accent);">2024</span>
             </div>
             <div class="item-place">IFF-CSIC</div>
-            <p style="color: #cbd5e1; margin-top: 10px;">
-                Research on <strong>Noble Gas Spectroscopy</strong>. Developed kernel-based machine learned potentials.
+            <p style="color: #cbd5e1;">
+                Research on <strong>Noble Gas Spectroscopy</strong> using ML potentials and quantum computations.
             </p>
-            <div style="background: rgba(6, 182, 212, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid var(--accent); margin-bottom: 20px;">
-                <strong style="color:#fff">Publication (In Prep):</strong> "Spectroscopic characterization of proton-bound Kr2H+ molecule"
+            <div style="background: rgba(0, 242, 255, 0.05); border: 1px solid var(--accent); padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 10px;">
+                <strong>Publication (Prep):</strong> "Spectroscopic characterization of proton-bound Kr2H+ molecule"
             </div>
-
-            <div class="item-header">
-                <div class="item-title">STEM Private Tutor</div>
-                <div class="item-date">2020 - Present</div>
-            </div>
-            <div class="item-place">Freelance</div>
         </div>
     </div>
 
     <div class="info-panel" id="panel-skills">
         <div class="glass-card">
-            <h2>03. Skills Valley</h2>
+            <h2>SKILLS & TOOLS</h2>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                 <div>
-                    <h3 style="font-size: 1rem; color: #fff; margin-bottom: 15px;">Languages</h3>
+                    <h3 style="color:#fff; font-size: 1rem; margin-bottom: 15px;">Languages</h3>
                     <div class="skill-item">
-                        <div class="skill-text"><span>Fortran</span><span>Adv</span></div>
-                        <div class="skill-bg"><div class="skill-fill" style="width: 85%"></div></div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>Fortran</span><span>Adv</span></div>
+                        <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-text"><span>Bash</span><span>Adv</span></div>
-                        <div class="skill-bg"><div class="skill-fill" style="width: 80%"></div></div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>Bash</span><span>Adv</span></div>
+                        <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%"></div></div>
                     </div>
                     <div class="skill-item">
-                        <div class="skill-text"><span>Python</span><span>Int</span></div>
-                        <div class="skill-bg"><div class="skill-fill" style="width: 65%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-text"><span>C</span><span>Basic</span></div>
-                        <div class="skill-bg"><div class="skill-fill" style="width: 25%"></div></div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>Python</span><span>Int</span></div>
+                        <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 65%"></div></div>
                     </div>
                 </div>
                 <div>
-                    <h3 style="font-size: 1rem; color: #fff; margin-bottom: 15px;">Software & Learning</h3>
+                    <h3 style="color:#fff; font-size: 1rem; margin-bottom: 15px;">Software</h3>
                     <ul class="tags">
                         <li>Gaussian</li> <li>Orca</li> <li>Molpro</li> <li>Spartan</li> <li>LaTeX</li> <li>Gnuplot</li>
-                    </ul>
-                    <h3 style="font-size: 1rem; color: #fff; margin-top: 20px; margin-bottom: 15px;">Seminars</h3>
-                    <ul style="font-size: 0.85rem; padding-left: 15px; color: #cbd5e1;">
-                        <li>Big data in quantum astrochemistry (2024)</li>
-                        <li>Complex organic molecules in ISM (2024)</li>
                     </ul>
                 </div>
             </div>
@@ -274,205 +213,245 @@
     <div class="info-panel" id="panel-contact">
         <div class="glass-card" style="text-align: center;">
             <img src="profile.jpg" alt="David" class="profile-pic">
-            <h2>Final Destination</h2>
-            <p style="color: #cbd5e1; margin-bottom: 20px;">
-                Ready to optimize calculations and collaborate?
-            </p>
-            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Initialize Contact</a>
+            <h2>CONTACT</h2>
+            <p style="color: #cbd5e1; margin-bottom: 25px;">Ready to compute the next big thing?</p>
+            <a href="mailto:rrodasdavid@gmail.com" class="hero-btn">Initialize Email</a>
         </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN THREE.JS
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000000, 0.003); // Niebla negra
+        // Niebla azul oscuro para fundir el horizonte
+        scene.fog = new THREE.FogExp2(0x020205, 0.006);
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // --- CREAR PES (SUPERFICIE) ---
-        const geometry = new THREE.PlaneGeometry(300, 300, 100, 100);
-        const count = geometry.attributes.position.count;
-        const positions = geometry.attributes.position;
+        // --- CREAR PES (TERRENO) ---
+        // Usamos muchos segmentos para que las montañas se vean definidas
+        const geometry = new THREE.PlaneGeometry(300, 600, 150, 300);
+        const pos = geometry.attributes.position;
         const colors = [];
         const color = new THREE.Color();
 
-        // Creamos montañas específicas en coordenadas clave
-        for (let i = 0; i < count; i++) {
-            const x = positions.getX(i);
-            const y = positions.getY(i); // En PlaneGeometry y es "arriba" 2D, luego lo rotamos
+        // Datos para las montañas (Posición X, Posición Y (en el plano 2d), Altura, Ancho)
+        // Nota: En PlaneGeometry Y es la profundidad antes de rotar.
+        const peaks = [
+            { x: 0, y: 50, h: 25, w: 600, label: "START" }, // Base inicial (no usada para titulo)
+            { x: -30, y: 0, h: 40, w: 400, label: "EDUCATION" },
+            { x: 30, y: -80, h: 45, w: 450, label: "EXPERIENCE" },
+            { x: -25, y: -160, h: 40, w: 400, label: "SKILLS" },
+            { x: 0, y: -240, h: 35, w: 400, label: "CONTACT" }
+        ];
+
+        for (let i = 0; i < pos.count; i++) {
+            const x = pos.getX(i);
+            const y = pos.getY(i);
             
-            // Base Wavy
-            let z = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 5;
+            // Ruido base (olas pequeñas)
+            let z = Math.sin(x * 0.1) * Math.cos(y * 0.1) * 2;
+            z += Math.random() * 0.5;
 
-            // Montaña Education (Top Left)
-            if (x < -20 && y > 20) z += 15 * Math.exp(-((x+50)**2 + (y-50)**2)/500);
-            
-            // Montaña Experience (Top Right)
-            if (x > 20 && y > 20) z += 12 * Math.exp(-((x-50)**2 + (y-50)**2)/600);
+            // Añadir las montañas definidas en 'peaks'
+            peaks.forEach(p => {
+                // Función Gaussiana para crear montañas suaves
+                const distSq = (x - p.x)**2 + (y - p.y)**2;
+                z += p.h * Math.exp(-distSq / p.w);
+            });
 
-            // Montaña Skills (Bottom Left)
-            if (x < -20 && y < -20) z += 14 * Math.exp(-((x+40)**2 + (y+40)**2)/400);
+            pos.setZ(i, z);
 
-            // Montaña Contact (Bottom Right)
-            if (x > 20 && y < -20) z += 10 * Math.exp(-((x-40)**2 + (y+40)**2)/500);
-
-            positions.setZ(i, z);
-
-            // Colores por altura
-            const t = (z + 5) / 25; 
-            color.setHSL(0.6 - (t * 0.5), 0.9, 0.5);
+            // Colorear (Heatmap Style)
+            // Rojo/Blanco arriba (Alta energía), Azul/Negro abajo (Baja energía)
+            const heightRatio = Math.max(0, (z - 2) / 40); // Normalizar 0 a 1 aprox
+            if(z < 5) {
+                color.setHex(0x000022); // Fondo oscuro
+            } else {
+                // Gradiente Cyan -> Azul -> Blanco
+                color.setHSL(0.55 - (heightRatio * 0.2), 1.0, 0.1 + heightRatio * 0.6);
+            }
             colors.push(color.r, color.g, color.b);
         }
-        
+
         geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
         geometry.computeVertexNormals();
 
         const material = new THREE.MeshBasicMaterial({ 
-            vertexColors: true, wireframe: true, transparent: true, opacity: 0.4 
+            vertexColors: true, wireframe: true, transparent: true, opacity: 0.6
         });
 
         const plane = new THREE.Mesh(geometry, material);
-        plane.rotation.x = -Math.PI / 2; 
+        // Rotar para que esté plano en el suelo (XZ)
+        plane.rotation.x = -Math.PI / 2;
         scene.add(plane);
 
-        // --- CONFIGURACIÓN DE PUNTOS DE RUTA (WAYPOINTS) ---
-        // Definimos dónde debe estar la cámara para cada sección
-        // Coordenadas aproximadas basadas en las montañas creadas arriba
-        const waypoints = [
-            { id: 'panel-home', pos: {x: 0, y: 80, z: 0}, lookAt: {x: 0, y: 0, z: 0} }, // Vista satélite
-            { id: 'panel-education', pos: {x: -30, y: 20, z: -30}, lookAt: {x: -50, y: 0, z: -50} }, // Education
-            { id: 'panel-experience', pos: {x: 30, y: 20, z: -30}, lookAt: {x: 50, y: 0, z: -50} }, // Experience
-            { id: 'panel-skills', pos: {x: -25, y: 15, z: 50}, lookAt: {x: -40, y: 0, z: 40} }, // Skills
-            { id: 'panel-contact', pos: {x: 25, y: 15, z: 50}, lookAt: {x: 40, y: 0, z: -40} } // Contact
-        ];
+        // --- CREAR TÍTULOS 3D (HOLLYWOOD STYLE) ---
+        function createTextTexture(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            // Fondo transparente
+            ctx.fillStyle = 'rgba(0,0,0,0)'; 
+            ctx.clearRect(0,0, canvas.width, canvas.height);
 
-        // Etiquetas 3D (Coordenadas en el mundo)
-        const labelsData = [
-            { text: "EDUCATION", x: -50, y: 15, z: -50, target: 1 }, // target = index in waypoints
-            { text: "EXPERIENCE", x: 50, y: 12, z: -50, target: 2 },
-            { text: "SKILLS", x: -40, y: 14, z: 40, target: 3 },
-            { text: "CONTACT", x: 40, y: 10, z: -40, target: 4 }
-        ];
+            // Texto Neón
+            ctx.font = 'bold 120px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = "#00f2ff";
+            ctx.shadowBlur = 30;
+            ctx.fillText(text, 512, 160);
+            
+            // Borde (opcional)
+            ctx.strokeStyle = '#00f2ff';
+            ctx.lineWidth = 4;
+            ctx.strokeText(text, 512, 160);
 
-        // Crear elementos DOM para las etiquetas
-        const labelsContainer = document.getElementById('labels-container');
-        const domLabels = [];
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
 
-        labelsData.forEach(data => {
-            const el = document.createElement('div');
-            el.className = 'world-label';
-            el.innerText = data.text;
-            // Al hacer click, hacemos scroll hasta ese punto
-            el.onclick = () => {
-                const totalHeight = document.body.scrollHeight - window.innerHeight;
-                const targetScroll = (data.target / (waypoints.length - 1)) * totalHeight;
-                window.scrollTo({ top: targetScroll, behavior: 'smooth' });
-            };
-            labelsContainer.appendChild(el);
-            domLabels.push({ el: el, pos: new THREE.Vector3(data.x, data.y, data.z) });
+        peaks.forEach((p, index) => {
+            if(index === 0) return; // Saltar el "start" dummy
+
+            const tex = createTextTexture(p.label);
+            const labelMat = new THREE.MeshBasicMaterial({ 
+                map: tex, transparent: true, side: THREE.DoubleSide, depthTest: false 
+            });
+            // Hacemos el cartel grande
+            const labelGeo = new THREE.PlaneGeometry(60, 15);
+            const labelMesh = new THREE.Mesh(labelGeo, labelMat);
+
+            // Posicionamos el cartel ENCIMA de la montaña
+            // Ojo con las coordenadas: en Threejs Y es arriba.
+            // Nuestra PES está rotada, así que:
+            // PES x = mundo x
+            // PES y (profundidad original) = mundo -z
+            // PES z (altura calculada) = mundo y
+            
+            labelMesh.position.set(p.x, p.h + 10, -p.y); // +10 para flotar sobre el pico
+            
+            // Importante: El cartel debe mirar hacia donde vendrá la cámara
+            // Como volamos hacia -Z, el cartel mira hacia +Z (defecto)
+            
+            scene.add(labelMesh);
+            
+            // Añadimos una linea vertical ("poste") para que parezca clavado
+            const poleGeo = new THREE.BoxGeometry(0.5, 10, 0.5);
+            const poleMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff });
+            const pole = new THREE.Mesh(poleGeo, poleMat);
+            pole.position.set(p.x, p.h + 5, -p.y);
+            scene.add(pole);
         });
 
-        // --- LÓGICA DE MOVIMIENTO ---
-        function updateCamera() {
+
+        // --- WAYPOINTS (RUTA DE VUELO) ---
+        // Definimos por dónde pasará la cámara
+        const waypoints = [
+            // Home (Alto y mirando horizonte)
+            { id: 'panel-home', pos: new THREE.Vector3(0, 30, 80), lookAt: new THREE.Vector3(0, 10, -50) },
+            
+            // Education (Volamos bajo hacia la montaña izquierda)
+            { id: 'panel-education', pos: new THREE.Vector3(-15, 25, 20), lookAt: new THREE.Vector3(-30, 40, 0) },
+            
+            // Experience (Cruzamos hacia la derecha)
+            { id: 'panel-experience', pos: new THREE.Vector3(15, 30, 50), lookAt: new THREE.Vector3(30, 45, 80) },
+            
+            // Skills (Volvemos izq y bajamos más profundo en Z)
+            { id: 'panel-skills', pos: new THREE.Vector3(-10, 25, 140), lookAt: new THREE.Vector3(-25, 40, 160) },
+            
+            // Contact (Final)
+            { id: 'panel-contact', pos: new THREE.Vector3(0, 20, 220), lookAt: new THREE.Vector3(0, 35, 240) }
+        ];
+        
+        // CORRECCIÓN DE COORDENADAS DE WAYPOINTS PARA QUE COINCIDAN CON MONTAÑAS
+        // Las montañas están en Z negativo (porque en la generación usamos -p.y para posicionar).
+        // Montaña Edu: x -30, z 0. Exp: x 30, z 80. Skills: x -25, z 160...
+        
+        // Vamos a redefinir la ruta para que sea un viaje lineal "hacia adelante" por el cañón
+        // Pico 1 (Edu) está en Z = 0 (aprox). Pico 2 (Exp) en Z = 80...
+        // La cámara debe estar ANTES del pico mirando hacia él.
+        
+        const flightPath = [
+            { id: 'panel-home', z: 120, x: 0, y: 30,  lookOffset: {x:0, y:-5, z:-50} }, 
+            { id: 'panel-education', z: 30, x: -10, y: 20, lookOffset: {x:-20, y:10, z:-40} }, // Mirando al pico Edu (que está en Z=0)
+            { id: 'panel-experience', z: -50, x: 10, y: 20, lookOffset: {x:20, y:10, z:-40} }, // Mirando al pico Exp (está en Z=-80)
+            { id: 'panel-skills', z: -130, x: -10, y: 20, lookOffset: {x:-15, y:10, z:-40} }, // Mirando al pico Skill (Z=-160)
+            { id: 'panel-contact', z: -200, x: 0, y: 25, lookOffset: {x:0, y:5, z:-40} }   // Mirando al pico Contact (Z=-240)
+        ];
+
+        function moveCamera() {
             const scrollY = window.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
             const scrollPercent = scrollY / maxScroll; // 0 a 1
 
-            // Encontrar entre qué waypoints estamos
-            // Tenemos 5 puntos, así que 4 segmentos (0-0.25, 0.25-0.50, etc)
-            const segmentSize = 1 / (waypoints.length - 1);
+            // Interpolación entre puntos
+            const segmentSize = 1 / (flightPath.length - 1);
             let currentIndex = Math.floor(scrollPercent / segmentSize);
-            
-            if (currentIndex >= waypoints.length - 1) currentIndex = waypoints.length - 2;
+            if (currentIndex >= flightPath.length - 1) currentIndex = flightPath.length - 2;
             
             const nextIndex = currentIndex + 1;
-            
-            // Calcular progreso dentro del segmento actual (0 a 1)
             const segmentProgress = (scrollPercent - (currentIndex * segmentSize)) / segmentSize;
 
-            // Interpolar Posición
-            const p1 = waypoints[currentIndex].pos;
-            const p2 = waypoints[nextIndex].pos;
-            
+            const p1 = flightPath[currentIndex];
+            const p2 = flightPath[nextIndex];
+
+            // Posición Cámara
             camera.position.x = p1.x + (p2.x - p1.x) * segmentProgress;
             camera.position.y = p1.y + (p2.y - p1.y) * segmentProgress;
             camera.position.z = p1.z + (p2.z - p1.z) * segmentProgress;
 
-            // Interpolar LookAt (hacia dónde mira)
-            const l1 = waypoints[currentIndex].lookAt;
-            const l2 = waypoints[nextIndex].lookAt;
-            
-            const currentLookX = l1.x + (l2.x - l1.x) * segmentProgress;
-            const currentLookY = l1.y + (l2.y - l1.y) * segmentProgress;
-            const currentLookZ = l1.z + (l2.z - l1.z) * segmentProgress;
-            
-            camera.lookAt(currentLookX, currentLookY, currentLookZ);
+            // LookAt Dinámico (Miramos siempre un poco adelante)
+            // Interpolamos el offset de mirada
+            const offX = p1.lookOffset.x + (p2.lookOffset.x - p1.lookOffset.x) * segmentProgress;
+            const offY = p1.lookOffset.y + (p2.lookOffset.y - p1.lookOffset.y) * segmentProgress;
+            const offZ = p1.lookOffset.z + (p2.lookOffset.z - p1.lookOffset.z) * segmentProgress;
 
-            // --- MOSTRAR/OCULTAR PANELES ---
-            // Mostramos el panel del waypoint más cercano
-            // Si estamos muy cerca de un waypoint (ej: +/- 0.15 del centro del waypoint)
-            const waypointCenter = currentIndex * segmentSize;
-            const distToCurrent = Math.abs(scrollPercent - waypointCenter);
-            const distToNext = Math.abs(scrollPercent - (nextIndex * segmentSize));
+            camera.lookAt(
+                camera.position.x + offX, 
+                camera.position.y + offY, 
+                camera.position.z + offZ
+            );
 
-            // Resetear todos
+            // ACTIVAR PANELES
+            // Si estamos cerca de un punto clave ("parada"), mostramos panel
+            // Zona activa: +/- 15% del centro del segmento
+            const pointProgress = scrollPercent * (flightPath.length - 1); // 0, 1, 2, 3...
+            const closestPoint = Math.round(pointProgress);
+            const dist = Math.abs(pointProgress - closestPoint);
+
+            // Ocultar todos
             document.querySelectorAll('.info-panel').forEach(p => p.classList.remove('active'));
-            document.querySelector('.scroll-indicator').style.opacity = (scrollPercent > 0.05) ? 0 : 0.7;
-
-            // Determinar cuál mostrar
-            let activePanelId = null;
-            if (distToCurrent < 0.1) activePanelId = waypoints[currentIndex].id;
-            else if (distToNext < 0.1) activePanelId = waypoints[nextIndex].id;
-
-            if (activePanelId) {
-                document.getElementById(activePanelId).classList.add('active');
+            
+            if (dist < 0.25) { // Si estamos cerca del waypoint
+                const panelId = flightPath[closestPoint].id;
+                document.getElementById(panelId).classList.add('active');
             }
-
-            // --- ACTUALIZAR POSICIÓN DE ETIQUETAS 3D EN PANTALLA ---
-            domLabels.forEach(lbl => {
-                // Proyectar coordenadas 3D a 2D
-                const vector = lbl.pos.clone();
-                vector.project(camera);
-
-                const x = (vector.x * .5 + .5) * window.innerWidth;
-                const y = (-(vector.y * .5) + .5) * window.innerHeight;
-
-                // Solo mostrar si está delante de la cámara
-                if (vector.z < 1) {
-                    lbl.el.style.left = `${x}px`;
-                    lbl.el.style.top = `${y}px`;
-                    lbl.el.style.display = 'block';
-                    
-                    // Efecto de desvanecimiento si la cámara se acerca mucho
-                    const dist = camera.position.distanceTo(lbl.pos);
-                    lbl.el.style.opacity = Math.min(1, (dist - 10) / 30); // Se oculta si está a < 10 unidades
-                } else {
-                    lbl.el.style.display = 'none';
-                }
-            });
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            // Vibración suave
-            plane.position.y = Math.sin(Date.now() * 0.0005) * 1; 
+            // Efecto de viento/velocidad en la malla (ondulando suavemente)
+            const time = Date.now() * 0.001;
+            // No modificamos vértices cada frame por rendimiento, 
+            // pero podríamos rotar un poco las nubes o partículas si las hubiera.
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('scroll', updateCamera);
+        window.addEventListener('scroll', moveCamera);
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            updateCamera(); // Recalcular pos etiquetas
+            moveCamera();
         });
 
-        // Inicio
+        // Init
+        moveCamera();
         animate();
-        updateCamera();
 
     </script>
 </body>
