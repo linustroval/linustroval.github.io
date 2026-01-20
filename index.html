@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV de [Tu Nombre]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS (El diseño visual) --- */
+        :root {
+            --color-primario: #2563eb; /* Azul moderno */
+            --color-texto: #334155;    /* Gris oscuro para leer bien */
+            --color-fondo: #f8fafc;    /* Gris muy clarito de fondo */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .contenedor {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Cabecera */
+        header {
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #1e293b;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .subtitulo {
+            color: var(--color-primario);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Secciones */
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            border-left: 5px solid var(--color-primario);
+            padding-left: 10px;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
+        /* Experiencia y Educación */
+        .item {
+            margin-bottom: 20px;
+        }
+        
+        .item-titulo {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .fecha {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* Lista de Habilidades (Tags) */
+        .skills {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skills li {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Contacto */
+        .contacto-btn {
+            display: inline-block;
+            background-color: var(--color-primario);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .contacto-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Móvil */
+        @media (max-width: 600px) {
+            .contenedor { margin: 10px; padding: 20px; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor">
+        <header>
+            <h1>[TU NOMBRE AQUÍ]</h1>
+            <div class="subtitulo">Profesión o Título Principal</div>
+            <p>📍 Ciudad, País | 📧 tuemail@ejemplo.com</p>
+        </header>
+
+        <section>
+            <h2>Sobre mí</h2>
+            <p>Aquí escribes un breve resumen de quién eres. Soy un profesional apasionado por [Tu Sector] con experiencia en gestionar proyectos y resolver problemas. Me encanta aprender cosas nuevas como programar mi propia web.</p>
+        </section>
+
+        <section>
+            <h2>Experiencia Laboral</h2>
+            
+            <div class="item">
+                <div class="item-titulo">Cargo o Puesto - Nombre de la Empresa</div>
+                <span class="fecha">Enero 2020 - Actualidad</span>
+                <p>Descripción de lo que hacías en este trabajo. Logros conseguidos y tareas principales.</p>
+            </div>
+
+            <div class="item">
+                <div class="item-titulo">Cargo Anterior - Otra Empresa</div>
+                <span class="fecha">Marzo 2018 - Diciembre 2019</span>
+                <p>Descripción breve de tus funciones en este puesto anterior.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Habilidades</h2>
+            <ul class="skills">
+                <li>HTML & CSS</li>
+                <li>Trabajo en Equipo</li>
+                <li>Gestión de Tiempo</li>
+                <li>Excel Avanzado</li>
+                <li>Inglés (B2)</li>
+            </ul>
+        </section>
+
+        <section style="text-align: center; margin-top: 50px;">
+            <p>¿Te interesa mi perfil?</p>
+            <a href="mailto:tuemail@ejemplo.com" class="contacto-btn">Contactar conmigo</a>
+        </section>
+    </div>
+
+</body>
+</html>
