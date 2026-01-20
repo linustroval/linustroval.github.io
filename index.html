@@ -3,71 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Ruiz Rodas - Resume</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>David Ruiz Rodas - Computational Chemist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary-color: #2563eb; 
-            --text-color: #334155;    
-            --bg-color: #f8fafc;      
+            /* Paleta Dark Scientific */
+            --bg-dark: #0f172a;       /* Azul muy oscuro, casi negro */
+            --card-bg: rgba(30, 41, 59, 0.7); /* Fondo semitransparente */
+            --text-main: #e2e8f0;     /* Blanco suave */
+            --text-muted: #94a3b8;    /* Gris azulado */
+            --accent: #38bdf8;        /* Cian eléctrico */
+            
+            /* Gradiente "Espectro" */
+            --spectrum-gradient: linear-gradient(90deg, #ef4444, #eab308, #22c55e, #3b82f6, #a855f7);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Outfit', sans-serif; /* Fuente más moderna y geométrica */
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 20%);
+            color: var(--text-main);
             margin: 0;
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 900px;
+            margin: 60px auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px); /* Efecto cristal */
+            padding: 50px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* HEADER & PHOTO */
+        /* La barra superior de "Espectroscopía" */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--spectrum-gradient);
+        }
+
+        /* HEADER */
         header {
-            text-align: center;
-            border-bottom: 2px solid #e2e8f0;
+            text-align: left;
+            margin-bottom: 50px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 30px;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
         }
 
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--primary-color);
-            margin-bottom: 15px;
-            background-color: #e2e8f0; 
+        .header-content {
+            flex: 1;
         }
 
         h1 {
-            color: #1e293b;
+            color: #fff;
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 3rem;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
-            color: var(--primary-color);
-            font-size: 1.2rem;
+            color: var(--accent);
+            font-size: 1.3rem;
             font-weight: 600;
             margin-top: 5px;
+            font-family: monospace; /* Toque "code" */
         }
 
-        /* SOCIAL LINKS */
+        /* SOCIAL LINKS (Top Right) */
         .social-links {
-            margin-top: 15px;
             display: flex;
-            justify-content: center;
             gap: 15px;
-            flex-wrap: wrap;
+            margin-top: 20px;
         }
 
         .social-btn {
@@ -75,60 +101,85 @@
             align-items: center;
             gap: 8px;
             text-decoration: none;
-            color: #334155;
-            background: white;
-            border: 1px solid #cbd5e1;
+            color: var(--text-main);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .social-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            background-color: #eff6ff;
+            background: rgba(56, 189, 248, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
             transform: translateY(-2px);
         }
 
         /* SECTIONS */
-        section { margin-bottom: 35px; }
+        section { margin-bottom: 50px; }
 
         h2 {
-            border-left: 5px solid var(--primary-color);
-            padding-left: 10px;
-            color: #1e293b;
-            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+
+        h2::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
         }
 
         /* ITEMS */
-        .item { margin-bottom: 25px; }
+        .item { 
+            margin-bottom: 30px; 
+            padding-left: 20px;
+            border-left: 2px solid rgba(255,255,255,0.1);
+            transition: border-color 0.3s;
+        }
+
+        .item:hover {
+            border-left-color: var(--accent);
+        }
         
         .item-title {
             font-weight: bold;
-            font-size: 1.1rem;
-            color: #1e293b;
+            font-size: 1.2rem;
+            color: #fff;
         }
 
         .item-subtitle {
             font-weight: 500;
-            color: #475569;
+            color: var(--accent);
         }
         
         .date {
-            color: #64748b;
+            color: var(--text-muted);
             font-size: 0.9rem;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            font-family: monospace;
         }
 
-        /* SKILLS */
-        .skills-category {
-            margin-bottom: 10px;
-            font-weight: bold;
-            display: block;
-            margin-top: 15px;
+        /* SKILLS GRID */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-group h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
         }
 
         .skills {
@@ -136,46 +187,76 @@
             padding: 0;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 8px;
         }
 
         .skills li {
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            background-color: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
         }
 
-        .pub-item {
-            font-style: italic;
-            background: #f1f5f9;
-            padding: 15px;
+        .skills li.highlight {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        /* PUBLICATIONS BOX */
+        .pub-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
             border-radius: 8px;
-            border-left: 3px solid #94a3b8;
         }
 
-        /* CONTACT FOOTER */
-        .contact-footer-btn {
-            display: inline-block;
-            background-color: var(--primary-color);
+        /* FOOTER & MINI PHOTO */
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .mini-profile {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            padding: 3px; /* Espacio entre foto y borde */
+            object-fit: cover;
+            filter: grayscale(20%); /* Un toque artístico */
+            transition: filter 0.3s;
+        }
+        
+        .mini-profile:hover { filter: grayscale(0%); }
+
+        .contact-btn {
+            background: var(--spectrum-gradient);
             color: white;
             padding: 12px 30px;
             text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: background 0.3s;
+            border-radius: 30px; /* Botón redondeado moderno */
+            font-weight: 700;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
         
-        .contact-footer-btn:hover { background-color: #1d4ed8; }
+        .contact-btn:hover { transform: scale(1.05); }
 
         @media (max-width: 600px) {
-            .container { margin: 0; padding: 25px; border-radius: 0; }
+            .container { margin: 0; border-radius: 0; padding: 25px; }
             h1 { font-size: 2rem; }
-            .social-links { flex-direction: column; align-items: center; }
-            .social-btn { width: 100%; justify-content: center; }
+            header { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .social-links { width: 100%; justify-content: flex-start; }
         }
     </style>
 </head>
@@ -183,18 +264,22 @@
 
     <div class="container">
         <header>
-            <img src="profile.jpg" alt="David Ruiz Rodas" class="profile-img">
-            
-            <h1>David Ruiz Rodas</h1>
-            <div class="subtitle">Chemist & Computational Researcher</div>
-            <p>📍 Madrid, Spain | 📧 rrodasdavid@gmail.com</p>
+            <div class="header-content">
+                <h1>David Ruiz Rodas</h1>
+                <div class="subtitle">
+                    &lt;Chemist & Computational Researcher /&gt;
+                </div>
+                <p style="color: var(--text-muted); margin-top: 10px;">
+                    Specialized in noble gas spectroscopy & ML potentials
+                </p>
+            </div>
 
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="social-btn">
-                    🔗 LinkedIn Profile
+                    LinkedIn
                 </a>
                 <a href="https://github.com/linustroval" target="_blank" class="social-btn">
-                    💻 GitHub / linustroval
+                    GitHub
                 </a>
             </div>
         </header>
@@ -202,102 +287,91 @@
         <section>
             <h2>About Me</h2>
             <p>
-                Chemist specialized in Theoretical Chemistry and Computational Modeling, currently pursuing an MSc at UAM. 
-                I have research experience at IFF-CSIC focusing on noble gas spectroscopy and machine learning potentials. 
-                Strong programming background in Fortran and Python, passionate about applying computational tools to solve complex chemical problems.
+                Chemist specialized in Theoretical Chemistry and Computational Modeling (MSc at UAM). 
+                Passionate about bridging the gap between chemistry and code.
+                My work focuses on applying <strong>Machine Learning</strong> and <strong>Quantum Computations</strong> 
+                to solve complex problems in spectroscopy.
             </p>
         </section>
 
         <section>
-            <h2>Education</h2>
-            
+            <h2>Latest Research</h2>
+            <div class="pub-box">
+                <div style="color: var(--accent); font-size: 0.9rem; margin-bottom: 5px;">IN PREPARATION</div>
+                <strong>Spectroscopic characterization of proton-bound Kr2H+ molecule</strong><br>
+                <span style="color: var(--text-muted); font-size: 0.9rem;">
+                    Kernel-base machine learned potentials and quantum computations.
+                </span><br>
+                <em style="font-size: 0.85rem; opacity: 0.7;">Phys. Chem. Chem. Phys. (2024)</em>
+            </div>
+        </section>
+
+        <section>
+            <h2>Tech Stack</h2>
+            <div class="skills-grid">
+                <div class="skill-group">
+                    <h3>Programming</h3>
+                    <ul class="skills">
+                        <li class="highlight">Fortran</li>
+                        <li class="highlight">Python</li>
+                        <li>Bash</li>
+                        <li>C</li>
+                    </ul>
+                </div>
+                <div class="skill-group">
+                    <h3>Comp. Chemistry</h3>
+                    <ul class="skills">
+                        <li>Gaussian</li>
+                        <li>Orca</li>
+                        <li>Molpro</li>
+                        <li>Spartan</li>
+                    </ul>
+                </div>
+                <div class="skill-group">
+                    <h3>Tools</h3>
+                    <ul class="skills">
+                        <li>LaTeX</li>
+                        <li>Gnuplot</li>
+                        <li>Git</li>
+                        <li>Linux</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Experience & Education</h2>
+
             <div class="item">
-                <div class="item-title">MSc in Theoretical Chemistry and Computational Modeling</div>
-                <div class="item-subtitle">Universidad Autónoma de Madrid (UAM)</div>
+                <div class="item-title">MSc in Theoretical Chemistry</div>
+                <div class="item-subtitle">Universidad Autónoma de Madrid</div>
                 <span class="date">2024 - Present</span>
             </div>
 
             <div class="item">
-                <div class="item-title">BSc in Chemistry</div>
-                <div class="item-subtitle">Universidad Autónoma de Madrid (UAM)</div>
-                <span class="date">2020 - 2024</span>
-                <p>Average Grade: 6.82 | Credits completed: 240</p>
-            </div>
-        </section>
-
-        <section>
-            <h2>Publications</h2>
-            <div class="pub-item">
-                <strong>D. Ruiz Rodas</strong>, M. J. Montes de Oca-Estévez, R. Prosmiti. 
-                "Spectroscopic characterization of proton-bound Kr2H+ molecule: kernel-base machine learned potentials and quantum computations." 
-                <em>Phys. Chem. Chem. Phys.</em> (In preparation, 2024).
-            </div>
-        </section>
-
-        <section>
-            <h2>Experience</h2>
-
-            <div class="item">
                 <div class="item-title">Undergraduate Researcher (TFG)</div>
-                <div class="item-subtitle">Institute of Fundamental Physics (IFF-CSIC)</div>
+                <div class="item-subtitle">IFF-CSIC</div>
                 <span class="date">2024</span>
-                <p>Research on noble gas spectroscopy. Conducted quantum computations and analysis of machine learned potentials.</p>
-            </div>
-            
-            <div class="item">
-                <div class="item-title">Private Tutor</div>
-                <div class="item-subtitle">High School Level (ESO/Bachillerato)</div>
-                <span class="date">2020 - Present</span>
-                <p>Teaching science subjects and mathematics.</p>
+                <p style="font-size: 0.95rem; color: #ccc;">
+                    Research on noble gas spectroscopy using Machine Learning potentials.
+                </p>
             </div>
 
             <div class="item">
-                <div class="item-title">Internship (4º ESO+Empresa)</div>
-                <div class="item-subtitle">Universidad Autónoma de Madrid (UAM)</div>
-                <span class="date">2018</span>
+                <div class="item-title">BSc in Chemistry</div>
+                <div class="item-subtitle">Universidad Autónoma de Madrid</div>
+                <span class="date">2020 - 2024</span>
             </div>
         </section>
 
-        <section>
-            <h2>Technical Skills</h2>
+        <footer>
+            <img src="profile.jpg" alt="David Ruiz Rodas" class="mini-profile">
             
-            <span class="skills-category">Programming Languages</span>
-            <ul class="skills">
-                <li>Fortran (Advanced)</li>
-                <li>Python (Intermediate)</li>
-                <li>Bash / Shell Scripting</li>
-                <li>C (Basic)</li>
-            </ul>
-
-            <span class="skills-category">Computational Chemistry</span>
-            <ul class="skills">
-                <li>Gaussian</li>
-                <li>Orca</li>
-                <li>Molpro</li>
-                <li>Spartan</li>
-                <li>Molden</li>
-            </ul>
-
-            <span class="skills-category">Data Analysis & Tools</span>
-            <ul class="skills">
-                <li>LaTeX / Overleaf</li>
-                <li>OriginLab</li>
-                <li>Gnuplot</li>
-                <li>Excel</li>
-                <li>Avogadro</li>
-            </ul>
-
-            <span class="skills-category">Languages</span>
-            <ul class="skills">
-                <li>Spanish (Native)</li>
-                <li>English (B2 Certified)</li>
-            </ul>
-        </section>
-
-        <section style="text-align: center; margin-top: 50px;">
-            <p>Looking for a researcher?</p>
-            <a href="mailto:rrodasdavid@gmail.com" class="contact-footer-btn">Contact Me</a>
-        </section>
+            <p style="margin: 0; color: var(--text-muted);">
+                Ready to collaborate on new research projects?
+            </p>
+            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Contact Me</a>
+        </footer>
     </div>
 
 </body>
