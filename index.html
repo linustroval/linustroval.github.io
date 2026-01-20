@@ -8,11 +8,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --bg-dark: #050505;       
-            --card-bg: rgba(15, 15, 20, 0.85);
+            --bg-dark: #020205;       
+            --card-bg: rgba(10, 15, 20, 0.8);
             --text-main: #ffffff;     
-            --accent: #00f2ff; /* Cyan scientific look */
-            --peak-color: #ff3300;
+            --accent: #00f2ff;
         }
 
         body {
@@ -28,8 +27,8 @@
             z-index: 0;
         }
 
-        /* TALL SCROLL */
-        #scroll-dummy { height: 14000px; }
+        /* Reducimos altura total para que las cosas estén más cerca al hacer scroll */
+        #scroll-dummy { height: 10000px; }
 
         /* UI LAYER */
         .ui-layer {
@@ -41,11 +40,11 @@
         .info-panel {
             position: absolute;
             top: 50%; left: 50%;
-            transform: translate(-50%, -40%) scale(0.9);
-            width: 90%; max-width: 650px;
+            transform: translate(-50%, -30%) scale(0.9);
+            width: 85%; max-width: 600px;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .info-panel.active {
@@ -56,59 +55,51 @@
 
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 40px;
+            backdrop-filter: blur(15px); /* Más blur para legibilidad */
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             text-align: left;
         }
 
         /* TYPOGRAPHY */
-        h1 { font-size: 3rem; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: -1px; font-weight: 800; }
-        h2 { color: var(--accent); border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-top: 0; font-family: 'JetBrains Mono'; font-size: 1.6rem; }
-        h3 { color: #fff; font-size: 1.1rem; margin-bottom: 10px; margin-top: 25px; font-weight: 700; }
+        h1 { font-size: 2.5rem; margin: 0; color: #fff; text-transform: uppercase; font-weight: 800; }
+        h2 { color: var(--accent); border-bottom: 2px solid rgba(0,242,255,0.3); padding-bottom: 8px; margin-top: 0; font-family: 'JetBrains Mono'; font-size: 1.4rem; }
+        h3 { color: #fff; font-size: 1.1rem; margin-bottom: 10px; margin-top: 20px; font-weight: 700; }
         
         .role { color: #aaa; font-family: 'JetBrains Mono'; margin-top: 5px; font-size: 1.1rem; }
-        .quote { font-style: italic; color: #fff; margin: 25px 0; border-left: 3px solid var(--accent); padding-left: 20px; font-size: 1.0rem; line-height: 1.5; }
-
+        
         .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; align-items: flex-end; }
-        .item-title { font-weight: 800; color: #fff; font-size: 1.1rem; }
-        .item-place { color: #888; font-size: 0.9rem; font-family: 'JetBrains Mono'; }
+        .item-title { font-weight: 800; color: #fff; font-size: 1rem; }
+        .item-place { color: #888; font-size: 0.85rem; font-family: 'JetBrains Mono'; }
 
-        /* SKILLS */
-        .skill-row { display: flex; align-items: center; margin-bottom: 12px; }
-        .skill-name { width: 80px; font-family: 'JetBrains Mono'; font-size: 0.85rem; color: #ccc; font-weight: bold; }
-        .skill-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .skill-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .skill-name { width: 70px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #ccc; }
+        .skill-track { flex: 1; height: 5px; background: rgba(255,255,255,0.1); border-radius: 2px; }
         .skill-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #2563eb); }
         
-        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .tag { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 5px 12px; border-radius: 4px; font-size: 0.75rem; font-family: 'JetBrains Mono'; font-weight: bold; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .tag { background: rgba(0, 242, 255, 0.15); border: 1px solid var(--accent); color: var(--accent); padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; font-family: 'JetBrains Mono'; }
 
-        /* BUTTONS */
         .hero-btn {
-            display: inline-block; padding: 12px 25px; margin-top: 20px; margin-right: 15px;
-            background: transparent;
-            border: 1px solid var(--accent); color: var(--accent); text-decoration: none;
-            font-family: 'JetBrains Mono'; font-size: 0.9rem; font-weight: bold; transition: 0.3s;
+            display: inline-block; padding: 10px 20px; margin-top: 15px; margin-right: 10px;
+            background: transparent; border: 1px solid var(--accent); color: var(--accent); 
+            text-decoration: none; font-family: 'JetBrains Mono'; font-size: 0.9rem; transition: 0.3s;
         }
         .hero-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); }
 
-        /* INDICATOR */
         .indicator {
             position: fixed; bottom: 30px; width: 100%; text-align: center;
-            color: #fff; font-family: 'JetBrains Mono'; font-size: 0.8rem; letter-spacing: 2px;
-            opacity: 0.7; pointer-events: none;
+            color: #fff; font-family: 'JetBrains Mono'; font-size: 0.8rem; opacity: 0.7; pointer-events: none;
         }
-
     </style>
 </head>
 <body>
 
     <div id="canvas-container"></div>
     <div id="scroll-dummy"></div>
-    <div class="indicator">SCROLL TO ANALYZE THE SURFACE</div>
+    <div class="indicator">SCROLL TO TRAVERSE THE REACTION COORDINATE</div>
 
     <div class="ui-layer">
         
@@ -116,12 +107,9 @@
             <div class="glass-card" style="text-align: center;">
                 <h1>David Ruiz Rodas</h1>
                 <div class="role">Computational Chemist</div>
-                <div class="quote">
-                    "Nature isn't classical, dammit... make it quantum mechanical."
-                </div>
-                <p style="color: #ccc; font-size: 1rem; line-height: 1.6;">
-                    Welcome to my Potential Energy Surface (PES).<br>
-                    A clean spectroscopic analysis of my career path.
+                <p style="color: #ccc; margin-top: 15px;">
+                    Navigating the Potential Energy Surface of my career.<br>
+                    From Quantum Dynamics to Machine Learning.
                 </p>
                 <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="hero-btn">LinkedIn</a>
                 <a href="https://github.com/linustroval" target="_blank" class="hero-btn">GitHub</a>
@@ -134,7 +122,7 @@
                 <div class="item-header"><span class="item-title">MSc Theoretical Chemistry</span><span>Present</span></div>
                 <div class="item-place">Universidad Autónoma de Madrid</div>
                 
-                <div style="margin-top: 20px;" class="item-header"><span class="item-title">BSc Chemistry</span><span>2020-2024</span></div>
+                <div style="margin-top: 15px;" class="item-header"><span class="item-title">BSc Chemistry</span><span>2020-2024</span></div>
                 <div class="item-place">UAM (Avg: 6.82/10)</div>
             </div>
         </div>
@@ -143,39 +131,36 @@
             <div class="glass-card">
                 <h2>EXPERIENCE</h2>
                 <div class="item-header"><span class="item-title">Undergraduate Researcher</span><span>2024</span></div>
-                <div class="item-place">IFF-CSIC (Institute of Fundamental Physics)</div>
-                <p style="color: #bbb; margin-top: 10px; font-size: 0.95rem;">
-                    Noble Gas Spectroscopy. Development of Machine Learned potentials and quantum computations.
+                <div class="item-place">IFF-CSIC</div>
+                <p style="color: #bbb; margin-top: 5px; font-size: 0.9rem;">
+                    Noble Gas Spectroscopy. ML Potentials & Quantum Computations.
                 </p>
                 
-                <div style="margin-top: 25px;" class="item-header"><span class="item-title">Private Tutor</span><span>2020-Present</span></div>
-                <div class="item-place">STEM Subjects (High School Level)</div>
+                <div style="margin-top: 15px;" class="item-header"><span class="item-title">Private Tutor</span><span>2020-Present</span></div>
+                <div class="item-place">STEM Subjects (ESO/Bachillerato)</div>
             </div>
         </div>
 
         <div class="info-panel" id="panel-research">
             <div class="glass-card">
-                <h2>RESEARCH & ACADEMY</h2>
-                
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-left: 3px solid #ff3300; margin-bottom: 20px;">
-                    <div style="color: #ff3300; font-weight: bold; font-size: 0.8rem; margin-bottom: 5px;">LATEST PUBLICATION</div>
-                    <div style="color: #fff; font-weight: 600;">"Spectroscopic characterization of proton-bound Kr2H+: kernel-base machine learned potentials and quantum computations"</div>
-                    <div style="color: #888; font-size: 0.85rem; margin-top: 5px;">Phys. Chem. Chem. Phys. (In Prep)</div>
+                <h2>RESEARCH</h2>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-left: 2px solid #ff3300; margin-bottom: 15px;">
+                    <div style="color: #ff3300; font-size: 0.75rem; font-weight: bold;">PUBLICATION (In Prep)</div>
+                    <div style="color: #fff; font-size: 0.9rem; font-weight: 600;">"Spectroscopic characterization of proton-bound Kr2H+"</div>
+                    <div style="color: #888; font-size: 0.8rem;">Phys. Chem. Chem. Phys.</div>
                 </div>
-
-                <h3>Seminars Attended</h3>
-                <ul style="color: #ccc; font-size: 0.9rem; padding-left: 20px; line-height: 1.6;">
-                    <li>"Entering in the big data era of quantum astrochemistry" (UAM, 2024)</li>
-                    <li>"Understanding the formation of complex organic molecules in the ISM" (IFF-CSIC, 2024)</li>
+                <h3>Seminars</h3>
+                <ul style="color: #ccc; font-size: 0.85rem; padding-left: 20px;">
+                    <li>Big Data in Quantum Astrochemistry (UAM)</li>
+                    <li>Organic Molecules in ISM (IFF-CSIC)</li>
                 </ul>
             </div>
         </div>
 
         <div class="info-panel" id="panel-software">
             <div class="glass-card">
-                <h2>SOFTWARE STACK</h2>
-                
-                <h3>Computational Chemistry</h3>
+                <h2>SOFTWARE</h2>
+                <h3>Computational</h3>
                 <div class="tag-container">
                     <span class="tag">Orca</span>
                     <span class="tag">Gaussian</span>
@@ -183,30 +168,24 @@
                     <span class="tag">Spartan</span>
                     <span class="tag">Molden</span>
                 </div>
-
-                <h3>Data Analysis & Viz</h3>
+                <h3>Visualization</h3>
                 <div class="tag-container">
                     <span class="tag">Gnuplot</span>
                     <span class="tag">Avogadro</span>
                     <span class="tag">OriginLab</span>
-                    <span class="tag">Xmgrace</span>
-                    <span class="tag">Scidavis</span>
                 </div>
-
-                <h3>Documentation</h3>
+                <h3>Tools</h3>
                 <div class="tag-container">
                     <span class="tag">LaTeX</span>
-                    <span class="tag">Overleaf</span>
-                    <span class="tag">Lyx</span>
-                    <span class="tag">Office</span>
+                    <span class="tag">Bash</span>
+                    <span class="tag">Git</span>
                 </div>
             </div>
         </div>
 
         <div class="info-panel" id="panel-skills">
             <div class="glass-card">
-                <h2>PROGRAMMING</h2>
-                <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 20px;">Development proficiency levels:</p>
+                <h2>CODING</h2>
                 <div>
                     <div class="skill-row"><span class="skill-name">Fortran</span><div class="skill-track"><div class="skill-fill" style="width:90%"></div></div></div>
                     <div class="skill-row"><span class="skill-name">Bash</span><div class="skill-track"><div class="skill-fill" style="width:85%"></div></div></div>
@@ -216,28 +195,11 @@
             </div>
         </div>
 
-        <div class="info-panel" id="panel-languages">
-            <div class="glass-card">
-                <h2>LANGUAGES</h2>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                    <span style="color: #fff; font-weight: bold;">Spanish</span>
-                    <span style="color: var(--accent); font-family: 'JetBrains Mono';">Native</span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #fff; font-weight: bold;">English</span>
-                    <span style="color: var(--accent); font-family: 'JetBrains Mono';">B2 (Certified)</span>
-                </div>
-            </div>
-        </div>
-
         <div class="info-panel" id="panel-contact">
             <div class="glass-card" style="text-align: center;">
                 <h2>CONTACT</h2>
-                <p style="color: #ccc; font-size: 1rem; margin-bottom: 20px;">Ready for collaboration?</p>
-                <div style="margin-bottom: 20px; font-family: 'JetBrains Mono'; color: #fff; font-size: 1.1rem;">
-                    rrodasdavid@gmail.com
-                </div>
-                <a href="mailto:rrodasdavid@gmail.com" class="hero-btn">Send Email</a>
+                <p style="color: #ccc; margin-bottom: 15px;">Native Spanish | B2 English</p>
+                <a href="mailto:rrodasdavid@gmail.com" class="hero-btn">rrodasdavid@gmail.com</a>
             </div>
         </div>
 
@@ -246,112 +208,96 @@
     <script>
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x020205);
-        // Niebla muy lejana para suavizar el horizonte sin tapar los colores
-        scene.fog = new THREE.FogExp2(0x020205, 0.0008);
+        scene.fog = new THREE.FogExp2(0x020205, 0.001);
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 8000);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
         // --- LUCES ---
-        // Luz ambiental suave para ver la base
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         scene.add(ambientLight);
-
-        // Luz direccional para sombras en los picos
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(200, 500, 200);
+        
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(100, 300, 100);
         scene.add(dirLight);
 
-        // --- GEOMETRÍA DE ALTA RESOLUCIÓN ---
-        // Ancho 600, Largo 6000
-        // Segmentos: 300x1000 para curvas muy suaves
-        const geometry = new THREE.PlaneGeometry(600, 6000, 300, 1000);
+        // --- GEOMETRÍA ---
+        // Reducimos la longitud Z total de 6000 a 4200 para acercar todo
+        const geometry = new THREE.PlaneGeometry(500, 4200, 250, 600);
         const pos = geometry.attributes.position;
         const colors = [];
         const color = new THREE.Color();
 
-        // --- DEFINICIÓN DE EVENTOS (PICOS Y POZOS) ---
-        // Posicionados en Z (progreso) y X (izquierda/derecha)
+        // --- CONFIGURACIÓN DE SECCIONES ---
+        // z más comprimida. Intervalos de ~500-600 en lugar de 800
         const peaks = [
-            { id: 'panel-education', z: -600,  x: -80,  type: 'mountain', intensity: 130, width: 8000, label: "EDUCATION" },
-            { id: 'panel-experience',z: -1400, x: 80,   type: 'well',     intensity: 120, width: 8000, label: "EXPERIENCE" },
-            { id: 'panel-research',  z: -2200, x: -50,  type: 'mountain', intensity: 160, width: 9000, label: "RESEARCH" },
-            { id: 'panel-software',  z: -3000, x: 60,   type: 'well',     intensity: 130, width: 9000, label: "SOFTWARE" },
-            { id: 'panel-skills',    z: -3800, x: -70,  type: 'mountain', intensity: 140, width: 8000, label: "CODING" },
-            { id: 'panel-languages', z: -4600, x: 50,   type: 'well',     intensity: 100, width: 7000, label: "LANGUAGES" },
-            { id: 'panel-contact',   z: -5400, x: 0,    type: 'mountain', intensity: 180, width: 10000,label: "CONTACT" }
+            { id: 'panel-education', z: -500,  x: -60,  type: 'mountain', intensity: 110, width: 6000, label: "EDUCATION" },
+            { id: 'panel-experience',z: -1000, x: 60,   type: 'well',     intensity: 100, width: 5000, label: "EXPERIENCE" },
+            { id: 'panel-research',  z: -1550, x: -50,  type: 'mountain', intensity: 140, width: 7000, label: "RESEARCH" },
+            { id: 'panel-software',  z: -2100, x: 50,   type: 'well',     intensity: 110, width: 6000, label: "SOFTWARE" },
+            { id: 'panel-skills',    z: -2650, x: -60,  type: 'mountain', intensity: 120, width: 6000, label: "CODING" },
+            { id: 'panel-contact',   z: -3200, x: 0,    type: 'mountain', intensity: 160, width: 8000, label: "CONTACT" }
         ];
 
-        // --- CÁLCULO DE VÉRTICES (TERRENO LIMPIO) ---
+        // --- GENERACIÓN DE PES (MATH) ---
         for (let i = 0; i < pos.count; i++) {
             const x = pos.getX(i);
-            const y = pos.getY(i); // Z en el mundo real
+            const y = pos.getY(i); // Z Real
             
-            // 1. BASE PLANA (Con una ondulación casi imperceptible para que no sea estático 100%)
-            // Esto elimina las "piedras". Es un fluido suave.
-            let z = Math.sin(x * 0.01) * Math.cos(y * 0.005) * 4; 
+            // 1. FORMA GLOBAL (No plana)
+            // Simula un "Valle de Reacción" curvo + Ondulaciones armónicas
+            // x*x*0.001 crea una parábola suave (forma de U en el eje X)
+            let z = (x * x * 0.0015) + (Math.sin(x * 0.02) * 10) + (Math.cos(y * 0.01) * 10);
+            
+            // Ruido Perlin simple (suma de senos) para textura orgánica
+            z += Math.sin(x * 0.1 + y * 0.1) * 2;
 
-            // 2. AGREGAR PICOS Y POZOS GAUSSIANOS LIMPIOS
+            // 2. EVENTOS (PICOS/POZOS LOCALES)
             peaks.forEach(p => {
                 const distSq = (x - p.x)**2 + (y - (-p.z))**2;
                 const factor = p.type === 'mountain' ? 1 : -1;
-                // Función gaussiana suave
                 z += factor * p.intensity * Math.exp(-distSq / p.width);
             });
 
             pos.setZ(i, z);
 
-            // --- COLORIZACIÓN CIENTÍFICA ---
-            // Mapa de calor estilo imagen de referencia
-            // Z=0 -> Cian/Verde (Base)
-            // Z>0 -> Amarillo/Rojo (Pico)
-            // Z<0 -> Azul/Violeta (Pozo)
-
-            // Normalizamos rango aprox -150 a +200
-            // Usaremos HSL. 
-            // Hue 0.6 (Azul) a 0.0 (Rojo) pasando por Verde/Amarillo
+            // --- COLOR (Heatmap Científico) ---
+            // Azul Oscuro (Pozos) -> Cian/Verde (Medio) -> Rojo (Picos)
             
-            // Ajustamos el "punto medio" del color para que el plano sea Cyan (0.5 hue)
-            let h = 0.5; 
-            
-            if (z > 10) {
-                // Hacia arriba: Cyan (0.5) -> Rojo (0.0)
-                const t = Math.min(1, z / 150);
+            let h = 0.5; // Base Cyan
+            if (z > 20) {
+                // Hacia Rojo
+                const t = Math.min(1, (z - 20) / 120);
                 h = 0.5 - (t * 0.5); 
-            } else if (z < -10) {
-                // Hacia abajo: Cyan (0.5) -> Violeta (0.75)
-                const t = Math.min(1, Math.abs(z) / 130);
-                h = 0.5 + (t * 0.25);
-            } else {
-                // Plano
-                h = 0.5; // Cyan
+            } else if (z < -20) {
+                // Hacia Violeta
+                const t = Math.min(1, Math.abs(z + 20) / 100);
+                h = 0.5 + (t * 0.2);
             }
 
-            color.setHSL(h, 1.0, 0.5);
+            color.setHSL(h, 0.9, 0.5);
             colors.push(color.r, color.g, color.b);
         }
 
         geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
         geometry.computeVertexNormals();
 
-        // MATERIAL PRINCIPAL (Suave y brillante)
         const material = new THREE.MeshStandardMaterial({ 
             vertexColors: true, 
-            roughness: 0.3,
-            metalness: 0.1,
+            roughness: 0.4, 
+            metalness: 0.2,
             side: THREE.DoubleSide
         });
 
-        // MATERIAL DE CUADRÍCULA (GRID)
-        // Para imitar el gráfico científico, ponemos un wireframe negro/oscuro encima
+        // Grid negra superpuesta para look científico
         const wireMaterial = new THREE.MeshBasicMaterial({
             color: 0x000000,
             wireframe: true,
             transparent: true,
-            opacity: 0.15 // Sutil, como líneas de gráfico
+            opacity: 0.12
         });
 
         const plane = new THREE.Mesh(geometry, material);
@@ -360,125 +306,117 @@
         plane.rotation.x = -Math.PI / 2;
         wirePlane.rotation.x = -Math.PI / 2;
         
-        plane.position.z = -2500; 
-        wirePlane.position.z = -2500;
-        // Subimos un pelín el wireframe para evitar z-fighting
-        wirePlane.position.y = 0.5;
+        // Centrar
+        plane.position.z = -1800;
+        wirePlane.position.z = -1800;
+        wirePlane.position.y = 0.2; // Evitar z-fighting
 
         scene.add(plane);
         scene.add(wirePlane);
 
-        // --- ETIQUETAS (LABELS) ---
+        // --- LABELS ---
         function createLabel(text, x, y, z) {
             const canvas = document.createElement('canvas');
-            canvas.width = 600; canvas.height = 150;
+            canvas.width = 500; canvas.height = 120;
             const ctx = canvas.getContext('2d');
             
-            ctx.font = 'bold 70px Arial';
-            ctx.shadowColor = "rgba(0,0,0,1)";
-            ctx.shadowBlur = 10;
+            ctx.font = 'bold 60px Arial';
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(text, 300, 75);
+            // Sombra para legibilidad
+            ctx.shadowColor = "black";
+            ctx.shadowBlur = 8;
+            ctx.fillText(text, 250, 60);
 
             const tex = new THREE.CanvasTexture(canvas);
             const mesh = new THREE.Mesh(
-                new THREE.PlaneGeometry(70, 18),
-                new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide })
+                new THREE.PlaneGeometry(60, 15),
+                new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthTest: false })
             );
             
-            // Colocar etiqueta flotando sobre el evento
-            const h = y > 0 ? y + 30 : 20;
+            // Posicionamiento Ajustado: Siempre visible arriba del pico
+            const h = y > 0 ? y + 40 : 30; 
             mesh.position.set(x, h, z);
-            mesh.lookAt(0, 10000, 0); // Truco para que miren siempre un poco a cámara pero alineadas
+            // Render order para que el texto siempre se vea encima
+            mesh.renderOrder = 999;
             scene.add(mesh);
 
-            // Línea indicadora vertical
+            // Linea indicadora
             const lineGeo = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(x, h-9, z), 
+                new THREE.Vector3(x, h-7, z), 
                 new THREE.Vector3(x, y, z)
             ]);
-            const line = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }));
+            const line = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 }));
             scene.add(line);
         }
 
         peaks.forEach(p => {
             const h = p.type === 'mountain' ? p.intensity : -p.intensity;
-            createLabel(p.label, p.x, h, p.z);
+            // Calculamos altura real aproximada incluyendo la base curva en ese punto
+            // Base Z approx = (x^2)*0.0015
+            const baseH = (p.x * p.x * 0.0015);
+            createLabel(p.label, p.x, h + baseH, p.z);
         });
 
-        // --- CÁMARA Y MOVIMIENTO ---
-
+        // --- CÁMARA Y SCROLL ---
         function updateCamera() {
             const scrollY = window.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
             const progress = scrollY / maxScroll; 
 
-            // Z: Avance lineal
-            const currentZ = 200 - (progress * 5800);
+            // Z: Viaje más corto = más denso
+            const currentZ = 200 - (progress * 3800);
             camera.position.z = currentZ;
 
-            // Encontrar objetivo cercano (Pico/Pozo)
+            // Lógica de seguimiento
             let targetX = 0;
-            let currentType = 'flat';
-            let currentIntensity = 0;
+            let targetY = 50;
 
-            let closestPeak = null;
+            // Buscar pico cercano
+            let activePeak = null;
             let minDist = Infinity;
 
             peaks.forEach(p => {
                 const dist = Math.abs(currentZ - p.z);
-                if (dist < 1000) {
+                if (dist < 600) {
                     if (dist < minDist) {
                         minDist = dist;
-                        closestPeak = p;
+                        activePeak = p;
                     }
                 }
             });
 
-            if (closestPeak) {
-                // Si es pozo, vamos al centro
-                if (closestPeak.type === 'well') {
-                    targetX = closestPeak.x;
-                    currentType = 'well';
-                    currentIntensity = closestPeak.intensity;
+            if (activePeak) {
+                // Si es pozo, entrar. Si es montaña, rodear.
+                if (activePeak.type === 'well') {
+                    targetX = activePeak.x;
                 } else {
-                    // Si es montaña, nos desviamos un poco para verla en perspectiva
-                    targetX = closestPeak.x + (closestPeak.x > 0 ? -50 : 50); 
-                    currentType = 'mountain';
-                    currentIntensity = closestPeak.intensity;
+                    targetX = activePeak.x + (activePeak.x > 0 ? -45 : 45);
                 }
             }
 
             camera.position.x += (targetX - camera.position.x) * 0.05;
 
-            // Calcular altura del terreno bajo la cámara (Math puro)
-            let terrainHeight = 0;
-            // Base ripple
-            terrainHeight += Math.sin(camera.position.x * 0.01) * Math.cos(currentZ * 0.005) * 4;
-            // Picos
+            // Calcular altura del terreno bajo la cámara
+            let terrainHeight = (camera.position.x**2 * 0.0015) + 
+                                (Math.sin(camera.position.x * 0.02)*10) + 
+                                (Math.cos(currentZ * 0.01)*10);
+            
             peaks.forEach(p => {
                 const distSq = (camera.position.x - p.x)**2 + (currentZ - p.z)**2;
                 const factor = p.type === 'mountain' ? 1 : -1;
                 terrainHeight += factor * p.intensity * Math.exp(-distSq / p.width);
             });
 
-            // Altura de vuelo (Y)
-            let targetY = 50; // Altura crucero defecto
-
-            if (currentType === 'well') {
-                targetY = terrainHeight + 60; // Entrar en el pozo
-            } else if (currentType === 'mountain') {
-                targetY = Math.max(terrainHeight + 50, 70); // Subir montaña
-            } else {
-                targetY = 60; // Plano
-            }
-
-            camera.position.y += (targetY - camera.position.y) * 0.08;
+            // Altura suave
+            let desiredH = terrainHeight + 50;
+            if (activePeak && activePeak.type === 'well') desiredH = terrainHeight + 70; // Más margen en pozos
+            
+            camera.position.y += (desiredH - camera.position.y) * 0.1;
 
             // LookAt dinámico
-            camera.lookAt(camera.position.x * 0.5, camera.position.y - 10, currentZ - 200);
+            camera.lookAt(camera.position.x * 0.3, camera.position.y - 10, currentZ - 150);
 
             checkPanels(currentZ);
         }
@@ -487,12 +425,12 @@
             const panels = document.querySelectorAll('.info-panel');
             let activeFound = false;
 
-            if (window.scrollY > 100) document.getElementById('panel-home').classList.remove('active');
+            if (window.scrollY > 50) document.getElementById('panel-home').classList.remove('active');
             else document.getElementById('panel-home').classList.add('active');
 
             peaks.forEach(p => {
                 const distZ = Math.abs(z - p.z);
-                if (distZ < 200) { 
+                if (distZ < 250) { 
                     panels.forEach(pan => pan.classList.remove('active'));
                     const panel = document.getElementById(p.id);
                     if(panel) panel.classList.add('active');
@@ -500,7 +438,7 @@
                 }
             });
 
-            if (!activeFound && window.scrollY > 100) {
+            if (!activeFound && window.scrollY > 50) {
                  panels.forEach(pan => pan.classList.remove('active'));
             }
         }
