@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[Your Name] - Resume</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>David Ruiz Rodas - Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- STYLES (Visual Design) --- */
         :root {
-            --primary-color: #2563eb; /* Modern Blue */
-            --text-color: #334155;    /* Dark Gray for readability */
-            --bg-color: #f8fafc;      /* Light Gray background */
+            --primary-color: #2563eb; 
+            --text-color: #334155;    
+            --bg-color: #f8fafc;      
         }
 
         body {
@@ -31,12 +30,22 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        /* Header */
+        /* HEADER & PHOTO */
         header {
             text-align: center;
             border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 20px;
+            padding-bottom: 30px;
             margin-bottom: 30px;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+            margin-bottom: 15px;
+            background-color: #e2e8f0; /* Color de fondo mientras no hay foto */
         }
 
         h1 {
@@ -49,74 +58,90 @@
             color: var(--primary-color);
             font-size: 1.2rem;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
-        /* Sections */
-        section {
-            margin-bottom: 30px;
-        }
+        /* SECTIONS */
+        section { margin-bottom: 35px; }
 
         h2 {
             border-left: 5px solid var(--primary-color);
             padding-left: 10px;
             color: #1e293b;
-            margin-bottom: 15px;
-        }
-
-        /* Experience & Education Items */
-        .item {
             margin-bottom: 20px;
         }
+
+        /* ITEMS (Education/Experience) */
+        .item { margin-bottom: 25px; }
         
         .item-title {
             font-weight: bold;
             font-size: 1.1rem;
+            color: #1e293b;
+        }
+
+        .item-subtitle {
+            font-weight: 500;
+            color: #475569;
         }
         
         .date {
             color: #64748b;
             font-size: 0.9rem;
-            margin-bottom: 5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* SKILLS & TAGS */
+        .skills-category {
+            margin-bottom: 10px;
+            font-weight: bold;
             display: block;
         }
 
-        /* Skills Tags */
         .skills {
             list-style: none;
             padding: 0;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            margin-bottom: 20px;
         }
 
         .skills li {
-            background-color: #e0f2fe;
-            color: #0369a1;
-            padding: 5px 12px;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.9rem;
             font-weight: 500;
         }
 
-        /* Contact Button */
+        .pub-item {
+            font-style: italic;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #94a3b8;
+        }
+
+        /* CONTACT BTN */
         .contact-btn {
             display: inline-block;
             background-color: var(--primary-color);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 25px;
             text-decoration: none;
             border-radius: 6px;
+            font-weight: 600;
             margin-top: 10px;
+            transition: background 0.3s;
         }
         
-        .contact-btn:hover {
-            opacity: 0.9;
-        }
+        .contact-btn:hover { background-color: #1d4ed8; }
 
-        /* Mobile Responsive */
         @media (max-width: 600px) {
-            .container { margin: 10px; padding: 20px; }
+            .container { margin: 0; padding: 25px; border-radius: 0; }
             h1 { font-size: 2rem; }
         }
     </style>
@@ -125,46 +150,111 @@
 
     <div class="container">
         <header>
-            <h1>[YOUR NAME HERE]</h1>
-            <div class="subtitle">Professional Title / Role</div>
-            <p>📍 City, Country | 📧 your.email@example.com</p>
+            <img src="profile.jpg" alt="David Ruiz Rodas" class="profile-img">
+            
+            <h1>David Ruiz Rodas</h1>
+            <div class="subtitle">Chemist & Computational Researcher</div>
+            <p>📍 Madrid, Spain | 📧 rrodasdavid@gmail.com</p>
         </header>
 
         <section>
             <h2>About Me</h2>
-            <p>Passionate professional with experience in [Your Industry]. Dedicated to efficient project management and creative problem-solving. Always eager to learn new technologies and improve workflows.</p>
+            <p>
+                Chemist specialized in Theoretical Chemistry and Computational Modeling, currently pursuing an MSc at UAM. 
+                I have research experience at IFF-CSIC focusing on noble gas spectroscopy and machine learning potentials. 
+                Strong programming background in Fortran and Python, passionate about applying computational tools to solve complex chemical problems.
+            </p>
         </section>
 
         <section>
-            <h2>Work Experience</h2>
+            <h2>Education</h2>
             
             <div class="item">
-                <div class="item-title">Job Position - Company Name</div>
-                <span class="date">January 2022 - Present</span>
-                <p>Brief description of your responsibilities and key achievements in this role. Focus on results and technologies used.</p>
+                <div class="item-title">MSc in Theoretical Chemistry and Computational Modeling</div>
+                <div class="item-subtitle">Universidad Autónoma de Madrid (UAM)</div>
+                <span class="date">2024 - Present</span>
             </div>
 
             <div class="item">
-                <div class="item-title">Previous Position - Previous Company</div>
-                <span class="date">March 2019 - December 2021</span>
-                <p>Description of your tasks and contributions in this previous role.</p>
+                <div class="item-title">BSc in Chemistry</div>
+                <div class="item-subtitle">Universidad Autónoma de Madrid (UAM)</div>
+                <span class="date">2020 - 2024</span>
+                <p>Credits passed: 240. Note: 6.82</p>
             </div>
         </section>
 
         <section>
-            <h2>Skills</h2>
+            <h2>Publications</h2>
+            <div class="pub-item">
+                <strong>D. Ruiz Rodas</strong>, M. J. Montes de Oca-Estévez, R. Prosmiti. 
+                "Spectroscopic characterization of proton-bound Kr2H+ molecule: kernel-base machine learned potentials and quantum computations." 
+                <em>Phys. Chem. Chem. Phys.</em> (In preparation, 2024).
+            </div>
+        </section>
+
+        <section>
+            <h2>Experience</h2>
+
+            <div class="item">
+                <div class="item-title">Undergraduate Researcher (TFG)</div>
+                <div class="item-subtitle">Institute of Fundamental Physics (IFF-CSIC)</div>
+                <span class="date">2024</span>
+                <p>Research on noble gas spectroscopy. Conducted quantum computations and analysis of machine learned potentials.</p>
+            </div>
+            
+            <div class="item">
+                <div class="item-title">Private Tutor</div>
+                <div class="item-subtitle">High School Level (ESO/Bachillerato)</div>
+                <span class="date">2020 - Present</span>
+                <p>Teaching science subjects and mathematics, adapting communication skills to different learning levels.</p>
+            </div>
+
+            <div class="item">
+                <div class="item-title">Internship (4º ESO+Empresa)</div>
+                <div class="item-subtitle">Universidad Autónoma de Madrid (UAM)</div>
+                <span class="date">2018</span>
+            </div>
+        </section>
+
+        <section>
+            <h2>Technical Skills</h2>
+            
+            <span class="skills-category">Programming Languages</span>
             <ul class="skills">
-                <li>HTML & CSS</li>
-                <li>Project Management</li>
-                <li>Teamwork</li>
-                <li>Data Analysis</li>
-                <li>English (B2)</li>
+                <li>Fortran (Advanced)</li>
+                <li>Python (Intermediate)</li>
+                <li>Bash / Shell Scripting</li>
+                <li>C (Basic)</li>
+            </ul>
+
+            <span class="skills-category">Computational Chemistry</span>
+            <ul class="skills">
+                <li>Gaussian</li>
+                <li>Orca</li>
+                <li>Molpro</li>
+                <li>Spartan</li>
+                <li>Molden</li>
+            </ul>
+
+            <span class="skills-category">Data Analysis & Tools</span>
+            <ul class="skills">
+                <li>LaTeX / Overleaf</li>
+                <li>OriginLab</li>
+                <li>Gnuplot</li>
+                <li>Excel</li>
+                <li>Avogadro</li>
+            </ul>
+
+            <span class="skills-category">Languages</span>
+            <ul class="skills">
+                <li>Spanish (Native)</li>
+                <li>English (B2 Certified)</li>
             </ul>
         </section>
 
         <section style="text-align: center; margin-top: 50px;">
-            <p>Interested in my profile?</p>
-            <a href="mailto:your.email@example.com" class="contact-btn">Get in Touch</a>
+            <p>Looking for a researcher for your computational chemistry project?</p>
+            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Contact Me</a>
         </section>
     </div>
 
