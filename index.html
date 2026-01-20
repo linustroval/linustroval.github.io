@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Ruiz Rodas - Horizon Flight</title>
+    <title>David Ruiz Rodas - Infinite Horizon</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #020202;       
-            --card-bg: rgba(5, 10, 20, 0.9);
+            --bg-dark: #010103;       
+            --card-bg: rgba(8, 12, 25, 0.85);
             --text-main: #ffffff;     
             --text-muted: #94a3b8;    
             --accent: #00f2ff;
@@ -21,96 +23,97 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Importante para el canvas fixed */
         }
 
         /* LIENZO 3D */
         #canvas-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            /* Degradado más oscuro para simular horizonte profundo */
-            background: linear-gradient(to bottom, #020205 0%, #101525 100%);
+            z-index: 0;
+            cursor: crosshair; /* Puntero de precisión para seleccionar montañas */
         }
 
-        /* SCROLL DUMMY (Invisible) */
-        #scroll-dummy { height: 6000px; }
+        /* BARRA DE SCROLL "FANTASMA" */
+        /* Hacemos la página muy larga para navegar */
+        #scroll-dummy { height: 8000px; }
 
-        /* PANELES DE INFORMACIÓN (Aparecen al llegar) */
+        /* INTERFAZ UI (Sobre el 3D) */
+        .ui-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Dejar pasar clics al 3D */
+            z-index: 10;
+        }
+
+        /* PANELES DE INFORMACIÓN */
         .info-panel {
-            position: fixed;
+            position: absolute;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
-            width: 90%; max-width: 850px;
-            max-height: 85vh;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%; max-width: 800px;
+            max-height: 80vh;
             overflow-y: auto;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-            z-index: 10;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .info-panel.active {
             opacity: 1;
-            pointer-events: auto;
+            pointer-events: auto; /* Activar interacción */
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* ESTILOS DE TARJETAS */
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 242, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            position: relative;
         }
 
-        /* HERO STYLES */
-        .hero-title {
-            font-size: 4rem; font-weight: 800; margin: 0;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        /* Cruz de cierre para los paneles */
+        .close-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: transparent; border: 1px solid var(--accent);
+            color: var(--accent); width: 30px; height: 30px; border-radius: 50%;
+            cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
         }
-        .quote {
-            margin: 20px auto; font-family: 'JetBrains Mono'; font-style: italic; color: #cbd5e1;
-            border-left: 3px solid var(--accent); padding-left: 15px; text-align: left; max-width: 600px;
-        }
+        .close-btn:hover { background: var(--accent); color: #000; }
 
-        /* GENERAL CONTENT */
-        h2 { color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-top: 0; font-family: 'JetBrains Mono'; }
-        .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; flex-wrap: wrap; }
-        .item-title { font-weight: 700; font-size: 1.2rem; color: #fff; }
-        .item-place { color: #38bdf8; font-weight: 500; }
+        /* ESTILOS DE TEXTO */
+        h1 { font-size: 3.5rem; margin: 0; background: linear-gradient(to bottom, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-family: 'JetBrains Mono'; color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-top: 0; }
+        .quote { font-family: 'JetBrains Mono'; font-style: italic; color: #cbd5e1; border-left: 3px solid var(--accent); padding-left: 15px; margin: 20px 0; }
         
-        /* SKILLS */
-        .skill-item { margin-bottom: 15px; }
-        .skill-bar-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
-        .skill-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; box-shadow: 0 0 10px var(--accent); }
-        .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; }
-        .tags li { border: 1px solid rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 4px; font-size: 0.85rem; color: #cbd5e1; }
+        .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .item-title { font-weight: 700; color: #fff; font-size: 1.1rem; }
+        .item-place { color: #38bdf8; font-size: 0.95rem; }
+        
+        /* Skills Bars */
+        .skill-row { display: flex; align-items: center; margin-bottom: 12px; }
+        .skill-name { width: 80px; font-family: 'JetBrains Mono'; font-size: 0.85rem; color: #ccc; }
+        .skill-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .skill-fill { height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 
-        /* INDICADOR */
-        .scroll-indicator {
-            position: fixed; bottom: 40px; width: 100%; text-align: center;
-            color: var(--accent); font-family: 'JetBrains Mono'; font-size: 0.9rem;
-            animation: pulse 2s infinite; pointer-events: none; z-index: 5;
-            text-shadow: 0 0 10px var(--accent);
+        /* INSTRUCCIONES FLOTANTES */
+        .instructions {
+            position: fixed; bottom: 30px; width: 100%; text-align: center;
+            color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono'; font-size: 0.8rem;
+            pointer-events: none; z-index: 20;
         }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* BOTONES */
+        /* Foto */
+        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        
         .hero-btn {
             display: inline-block; padding: 10px 25px; margin: 10px;
             border: 1px solid var(--accent); color: var(--accent); text-decoration: none;
             font-family: 'JetBrains Mono'; border-radius: 4px; transition: 0.3s;
         }
-        .hero-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent); }
-
-        /* CSS PARA EL TEXTO 3D (Se usará como textura) */
-        /* No visible en el DOM, solo para crear texturas si fuera necesario, pero usaremos Canvas API */
-
-        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; }
+        .hero-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); }
 
     </style>
 </head>
@@ -118,159 +121,160 @@
 
     <div id="canvas-container"></div>
     <div id="scroll-dummy"></div>
-    <div class="scroll-indicator">SCROLL TO FLY ▾</div>
 
-    <div class="info-panel active" id="panel-home">
-        <div class="glass-card" style="text-align: center;">
-            <h1 class="hero-title">David Ruiz Rodas</h1>
-            <div style="color:var(--accent); font-family: 'JetBrains Mono'; margin-top: 10px; font-size: 1.2rem;">
-                Computational Chemist & Researcher
-            </div>
-            
-            <div class="quote">
-                "Nature isn't classical, dammit... make it quantum mechanical." 
-                <br><span style="color:#fff; font-size: 0.9rem;">— Richard Feynman</span>
-            </div>
+    <div class="instructions">SCROLL TO FLY  ///  CLICK MOUNTAINS TO JUMP</div>
 
-            <p style="color: #94a3b8; max-width: 600px; margin: 20px auto;">
-                Welcome to my <strong>Potential Energy Surface</strong>. <br>
-                Scroll to navigate through the energy barriers of my career.
-            </p>
-
-            <div>
-                <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="hero-btn">LinkedIn</a>
-                <a href="https://github.com/linustroval" target="_blank" class="hero-btn">GitHub</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="info-panel" id="panel-education">
-        <div class="glass-card">
-            <h2>EDUCATION</h2>
-            <div class="item-header">
-                <span class="item-title">MSc Theoretical Chemistry & Modeling</span>
-                <span style="color: var(--accent);">In Progress</span>
-            </div>
-            <div class="item-place">Universidad Autónoma de Madrid (2024-Present)</div>
-            
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
-
-            <div class="item-header">
-                <span class="item-title">BSc in Chemistry</span>
-                <span style="color: #94a3b8;">2020-2024</span>
-            </div>
-            <div class="item-place">Universidad Autónoma de Madrid</div>
-            <p style="color: #ccc; font-size: 0.9rem;">Avg Grade: 6.82 | Credits: 240</p>
-        </div>
-    </div>
-
-    <div class="info-panel" id="panel-experience">
-        <div class="glass-card">
-            <h2>EXPERIENCE</h2>
-            <div class="item-header">
-                <span class="item-title">Undergraduate Researcher (TFG)</span>
-                <span style="color: var(--accent);">2024</span>
-            </div>
-            <div class="item-place">IFF-CSIC</div>
-            <p style="color: #cbd5e1;">
-                Research on <strong>Noble Gas Spectroscopy</strong> using ML potentials and quantum computations.
-            </p>
-            <div style="background: rgba(0, 242, 255, 0.05); border: 1px solid var(--accent); padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 10px;">
-                <strong>Publication (Prep):</strong> "Spectroscopic characterization of proton-bound Kr2H+ molecule"
-            </div>
-        </div>
-    </div>
-
-    <div class="info-panel" id="panel-skills">
-        <div class="glass-card">
-            <h2>SKILLS & TOOLS</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                <div>
-                    <h3 style="color:#fff; font-size: 1rem; margin-bottom: 15px;">Languages</h3>
-                    <div class="skill-item">
-                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>Fortran</span><span>Adv</span></div>
-                        <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>Bash</span><span>Adv</span></div>
-                        <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%"></div></div>
-                    </div>
-                    <div class="skill-item">
-                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>Python</span><span>Int</span></div>
-                        <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 65%"></div></div>
-                    </div>
+    <div class="ui-layer">
+        
+        <div class="info-panel active" id="panel-home">
+            <div class="glass-card" style="text-align: center;">
+                <h1>David Ruiz Rodas</h1>
+                <div style="font-family: 'JetBrains Mono'; color: var(--accent); margin-top: 10px;">
+                    Computational Chemist
                 </div>
+                
+                <div class="quote">
+                    "Nature isn't classical, dammit... make it quantum mechanical."
+                </div>
+
+                <p style="color: #94a3b8; font-size: 0.95rem;">
+                    Welcome to the <strong>Landscape of my Career</strong>.<br>
+                    Look at the horizon. Those peaks represent my milestones.<br>
+                    <strong>Scroll down</strong> to fly there, or <strong>Click a mountain</strong> to warp.
+                </p>
+
                 <div>
-                    <h3 style="color:#fff; font-size: 1rem; margin-bottom: 15px;">Software</h3>
-                    <ul class="tags">
-                        <li>Gaussian</li> <li>Orca</li> <li>Molpro</li> <li>Spartan</li> <li>LaTeX</li> <li>Gnuplot</li>
-                    </ul>
+                    <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="hero-btn">LinkedIn</a>
+                    <a href="https://github.com/linustroval" target="_blank" class="hero-btn">GitHub</a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="info-panel" id="panel-contact">
-        <div class="glass-card" style="text-align: center;">
-            <img src="profile.jpg" alt="David" class="profile-pic">
-            <h2>CONTACT</h2>
-            <p style="color: #cbd5e1; margin-bottom: 25px;">Ready to compute the next big thing?</p>
-            <a href="mailto:rrodasdavid@gmail.com" class="hero-btn">Initialize Email</a>
+        <div class="info-panel" id="panel-education">
+            <div class="glass-card">
+                <button class="close-btn" onclick="closePanel()">×</button>
+                <h2>EDUCATION</h2>
+                <div class="item-header"><span class="item-title">MSc Theoretical Chemistry</span><span>Present</span></div>
+                <div class="item-place">Universidad Autónoma de Madrid</div>
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+                <div class="item-header"><span class="item-title">BSc Chemistry</span><span>2020-2024</span></div>
+                <div class="item-place">UAM</div>
+                <p style="font-size: 0.85rem; color: #aaa;">Avg Grade: 6.82 | Credits: 240</p>
+            </div>
         </div>
+
+        <div class="info-panel" id="panel-experience">
+            <div class="glass-card">
+                <button class="close-btn" onclick="closePanel()">×</button>
+                <h2>EXPERIENCE</h2>
+                <div class="item-header"><span class="item-title">Undergraduate Researcher</span><span>2024</span></div>
+                <div class="item-place">IFF-CSIC</div>
+                <p style="font-size: 0.9rem; color: #ccc;">
+                    <strong>Noble Gas Spectroscopy.</strong> Developed machine learned potentials and quantum computations.
+                </p>
+                <div style="background: rgba(0,242,255,0.05); padding: 10px; border-left: 2px solid var(--accent); font-size: 0.85rem;">
+                    Publication: "Spectroscopic characterization of proton-bound Kr2H+" (In Prep)
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel" id="panel-skills">
+            <div class="glass-card">
+                <button class="close-btn" onclick="closePanel()">×</button>
+                <h2>SKILLS MATRIX</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <div class="skill-row"><span class="skill-name">Fortran</span><div class="skill-track"><div class="skill-fill" style="width:90%"></div></div></div>
+                        <div class="skill-row"><span class="skill-name">Bash</span><div class="skill-track"><div class="skill-fill" style="width:85%"></div></div></div>
+                        <div class="skill-row"><span class="skill-name">Python</span><div class="skill-track"><div class="skill-fill" style="width:65%"></div></div></div>
+                        <div class="skill-row"><span class="skill-name">C</span><div class="skill-track"><div class="skill-fill" style="width:25%"></div></div></div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.9rem; color: #fff; margin-bottom: 10px;">Software Stack</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                            <span style="border:1px solid #555; padding:3px 8px; border-radius:4px; font-size:0.8rem; color:#ccc;">Gaussian</span>
+                            <span style="border:1px solid #555; padding:3px 8px; border-radius:4px; font-size:0.8rem; color:#ccc;">Orca</span>
+                            <span style="border:1px solid #555; padding:3px 8px; border-radius:4px; font-size:0.8rem; color:#ccc;">Molpro</span>
+                            <span style="border:1px solid #555; padding:3px 8px; border-radius:4px; font-size:0.8rem; color:#ccc;">LaTeX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel" id="panel-contact">
+            <div class="glass-card" style="text-align: center;">
+                <button class="close-btn" onclick="closePanel()">×</button>
+                <img src="profile.jpg" alt="David" class="profile-pic">
+                <h2>CONTACT</h2>
+                <p style="color: #ccc;">Collaboration ready.</p>
+                <a href="mailto:rrodasdavid@gmail.com" class="hero-btn">Initialize Email</a>
+            </div>
+        </div>
+
     </div>
 
     <script>
+        // --- 1. CONFIGURACIÓN THREE.JS ---
         const scene = new THREE.Scene();
-        // Niebla azul oscuro para fundir el horizonte
-        scene.fog = new THREE.FogExp2(0x020205, 0.006);
+        // Niebla negra progresiva para el horizonte infinito
+        scene.fog = new THREE.Fog(0x010103, 100, 1200);
 
-        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // --- CREAR PES (TERRENO) ---
-        // Usamos muchos segmentos para que las montañas se vean definidas
-        const geometry = new THREE.PlaneGeometry(300, 600, 150, 300);
+        // --- 2. GENERACIÓN DEL TERRENO (PES INFINITA) ---
+        // 400 de ancho, 2000 de largo (profundidad)
+        const geometry = new THREE.PlaneGeometry(400, 2000, 100, 500);
         const pos = geometry.attributes.position;
         const colors = [];
         const color = new THREE.Color();
 
-        // Datos para las montañas (Posición X, Posición Y (en el plano 2d), Altura, Ancho)
-        // Nota: En PlaneGeometry Y es la profundidad antes de rotar.
+        // Definimos las montañas "Clave" (Donde están las secciones)
+        // Z values: negativo es hacia el fondo.
         const peaks = [
-            { x: 0, y: 50, h: 25, w: 600, label: "START" }, // Base inicial (no usada para titulo)
-            { x: -30, y: 0, h: 40, w: 400, label: "EDUCATION" },
-            { x: 30, y: -80, h: 45, w: 450, label: "EXPERIENCE" },
-            { x: -25, y: -160, h: 40, w: 400, label: "SKILLS" },
-            { x: 0, y: -240, h: 35, w: 400, label: "CONTACT" }
+            { id: 'start', z: 100, x: 0, h: 0, label: null }, // Inicio
+            { id: 'panel-education', z: -300, x: -40, h: 50, label: "EDUCATION" },
+            { id: 'panel-experience', z: -700, x: 40, h: 60, label: "EXPERIENCE" },
+            { id: 'panel-skills', z: -1100, x: -30, h: 55, label: "SKILLS" },
+            { id: 'panel-contact', z: -1500, x: 0, h: 40, label: "CONTACT" }
         ];
 
+        // Esculpir el terreno
         for (let i = 0; i < pos.count; i++) {
             const x = pos.getX(i);
-            const y = pos.getY(i);
+            const y = pos.getY(i); // Y en PlaneGeometry es profundidad antes de rotar
             
-            // Ruido base (olas pequeñas)
-            let z = Math.sin(x * 0.1) * Math.cos(y * 0.1) * 2;
-            z += Math.random() * 0.5;
+            // Terreno base (ondas cuánticas)
+            let z = Math.sin(x * 0.05) * Math.cos(y * 0.02) * 5;
+            z += Math.random() * 1.5; // Ruido/Rugosidad
 
-            // Añadir las montañas definidas en 'peaks'
+            // Levantar las montañas clave
             peaks.forEach(p => {
-                // Función Gaussiana para crear montañas suaves
-                const distSq = (x - p.x)**2 + (y - p.y)**2;
-                z += p.h * Math.exp(-distSq / p.w);
+                if (p.label) {
+                    // Gaussian function para crear la montaña en esa posición
+                    // Usamos 'y' del loop comparado con 'p.z' porque rotaremos el plano
+                    // Nota: En PlaneGeometry sin rotar, Y va de +height/2 a -height/2.
+                    // Mapearemos nuestras coordenadas Z deseadas a la geometría.
+                    
+                    const distSq = (x - p.x)**2 + (y - (-p.z))**2; // -p.z porque Y crece hacia arriba en geo 2D
+                    // Ancho de la montaña: 8000
+                    z += p.h * Math.exp(-distSq / 8000);
+                }
             });
 
             pos.setZ(i, z);
 
-            // Colorear (Heatmap Style)
-            // Rojo/Blanco arriba (Alta energía), Azul/Negro abajo (Baja energía)
-            const heightRatio = Math.max(0, (z - 2) / 40); // Normalizar 0 a 1 aprox
-            if(z < 5) {
-                color.setHex(0x000022); // Fondo oscuro
+            // Colorear (Heatmap)
+            // Fondo oscuro, Picos Cyan/Blanco
+            const heightFactor = Math.max(0, (z - 5) / 50);
+            if (z < 8) {
+                color.setHex(0x050510); // Valle oscuro
             } else {
-                // Gradiente Cyan -> Azul -> Blanco
-                color.setHSL(0.55 - (heightRatio * 0.2), 1.0, 0.1 + heightRatio * 0.6);
+                // Gradiente Cyan Electrico
+                color.setHSL(0.5, 1.0, 0.1 + heightFactor * 0.9);
             }
             colors.push(color.r, color.g, color.b);
         }
@@ -279,179 +283,197 @@
         geometry.computeVertexNormals();
 
         const material = new THREE.MeshBasicMaterial({ 
-            vertexColors: true, wireframe: true, transparent: true, opacity: 0.6
+            vertexColors: true, wireframe: true, transparent: true, opacity: 0.5 
         });
 
         const plane = new THREE.Mesh(geometry, material);
-        // Rotar para que esté plano en el suelo (XZ)
-        plane.rotation.x = -Math.PI / 2;
+        plane.rotation.x = -Math.PI / 2; // Acostar
+        
+        // Ajustar posición para que Z=0 sea el inicio visible
+        // La geometría mide 2000. El centro es 0. Va de -1000 a 1000.
+        // Queremos que nuestras coordenadas Z (-300, -700...) calcen.
+        // Si el centro es 0, y queremos ir hacia atrás...
+        // Dejémoslo centrado en 0,0,0 y navegamos hacia -Z.
         scene.add(plane);
 
-        // --- CREAR TÍTULOS 3D (HOLLYWOOD STYLE) ---
-        function createTextTexture(text) {
+
+        // --- 3. CARTELES 3D CLICABLES ---
+        const interactables = []; // Array para el Raycaster
+
+        function createLabel(text, x, y, z) {
             const canvas = document.createElement('canvas');
-            canvas.width = 1024; canvas.height = 256;
+            canvas.width = 512; canvas.height = 128;
             const ctx = canvas.getContext('2d');
             
-            // Fondo transparente
-            ctx.fillStyle = 'rgba(0,0,0,0)'; 
-            ctx.clearRect(0,0, canvas.width, canvas.height);
-
-            // Texto Neón
-            ctx.font = 'bold 120px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillStyle = '#ffffff';
-            ctx.shadowColor = "#00f2ff";
-            ctx.shadowBlur = 30;
-            ctx.fillText(text, 512, 160);
-            
-            // Borde (opcional)
+            ctx.font = 'bold 80px Arial';
+            ctx.fillStyle = 'rgba(0, 242, 255, 0.1)'; // Fondo suave
+            ctx.fillRect(0,0, 512, 128);
             ctx.strokeStyle = '#00f2ff';
-            ctx.lineWidth = 4;
-            ctx.strokeText(text, 512, 160);
+            ctx.lineWidth = 5;
+            ctx.strokeRect(0,0, 512, 128);
+            
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor="cyan"; ctx.shadowBlur=20;
+            ctx.fillText(text, 256, 64);
 
             const tex = new THREE.CanvasTexture(canvas);
-            return tex;
+            const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide });
+            const geo = new THREE.PlaneGeometry(60, 15);
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            mesh.position.set(x, y + 15, z); // Flotando sobre el pico
+            mesh.name = text; // Para identificarlo al hacer click
+            scene.add(mesh);
+
+            // Poste
+            const pole = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, 15, 0.5),
+                new THREE.MeshBasicMaterial({color: 0x00f2ff})
+            );
+            pole.position.set(x, y + 7.5, z);
+            scene.add(pole);
+
+            return mesh;
         }
 
-        peaks.forEach((p, index) => {
-            if(index === 0) return; // Saltar el "start" dummy
-
-            const tex = createTextTexture(p.label);
-            const labelMat = new THREE.MeshBasicMaterial({ 
-                map: tex, transparent: true, side: THREE.DoubleSide, depthTest: false 
-            });
-            // Hacemos el cartel grande
-            const labelGeo = new THREE.PlaneGeometry(60, 15);
-            const labelMesh = new THREE.Mesh(labelGeo, labelMat);
-
-            // Posicionamos el cartel ENCIMA de la montaña
-            // Ojo con las coordenadas: en Threejs Y es arriba.
-            // Nuestra PES está rotada, así que:
-            // PES x = mundo x
-            // PES y (profundidad original) = mundo -z
-            // PES z (altura calculada) = mundo y
-            
-            labelMesh.position.set(p.x, p.h + 10, -p.y); // +10 para flotar sobre el pico
-            
-            // Importante: El cartel debe mirar hacia donde vendrá la cámara
-            // Como volamos hacia -Z, el cartel mira hacia +Z (defecto)
-            
-            scene.add(labelMesh);
-            
-            // Añadimos una linea vertical ("poste") para que parezca clavado
-            const poleGeo = new THREE.BoxGeometry(0.5, 10, 0.5);
-            const poleMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff });
-            const pole = new THREE.Mesh(poleGeo, poleMat);
-            pole.position.set(p.x, p.h + 5, -p.y);
-            scene.add(pole);
+        peaks.forEach(p => {
+            if(p.label) {
+                const mesh = createLabel(p.label, p.x, p.h, p.z);
+                // Guardamos referencia: malla 3D -> ID del panel HTML
+                mesh.userData = { targetId: p.id, scrollZ: p.z };
+                interactables.push(mesh);
+            }
         });
 
 
-        // --- WAYPOINTS (RUTA DE VUELO) ---
-        // Definimos por dónde pasará la cámara
-        const waypoints = [
-            // Home (Alto y mirando horizonte)
-            { id: 'panel-home', pos: new THREE.Vector3(0, 30, 80), lookAt: new THREE.Vector3(0, 10, -50) },
-            
-            // Education (Volamos bajo hacia la montaña izquierda)
-            { id: 'panel-education', pos: new THREE.Vector3(-15, 25, 20), lookAt: new THREE.Vector3(-30, 40, 0) },
-            
-            // Experience (Cruzamos hacia la derecha)
-            { id: 'panel-experience', pos: new THREE.Vector3(15, 30, 50), lookAt: new THREE.Vector3(30, 45, 80) },
-            
-            // Skills (Volvemos izq y bajamos más profundo en Z)
-            { id: 'panel-skills', pos: new THREE.Vector3(-10, 25, 140), lookAt: new THREE.Vector3(-25, 40, 160) },
-            
-            // Contact (Final)
-            { id: 'panel-contact', pos: new THREE.Vector3(0, 20, 220), lookAt: new THREE.Vector3(0, 35, 240) }
-        ];
+        // --- 4. CÁMARA Y MOVIMIENTO ---
         
-        // CORRECCIÓN DE COORDENADAS DE WAYPOINTS PARA QUE COINCIDAN CON MONTAÑAS
-        // Las montañas están en Z negativo (porque en la generación usamos -p.y para posicionar).
-        // Montaña Edu: x -30, z 0. Exp: x 30, z 80. Skills: x -25, z 160...
-        
-        // Vamos a redefinir la ruta para que sea un viaje lineal "hacia adelante" por el cañón
-        // Pico 1 (Edu) está en Z = 0 (aprox). Pico 2 (Exp) en Z = 80...
-        // La cámara debe estar ANTES del pico mirando hacia él.
-        
-        const flightPath = [
-            { id: 'panel-home', z: 120, x: 0, y: 30,  lookOffset: {x:0, y:-5, z:-50} }, 
-            { id: 'panel-education', z: 30, x: -10, y: 20, lookOffset: {x:-20, y:10, z:-40} }, // Mirando al pico Edu (que está en Z=0)
-            { id: 'panel-experience', z: -50, x: 10, y: 20, lookOffset: {x:20, y:10, z:-40} }, // Mirando al pico Exp (está en Z=-80)
-            { id: 'panel-skills', z: -130, x: -10, y: 20, lookOffset: {x:-15, y:10, z:-40} }, // Mirando al pico Skill (Z=-160)
-            { id: 'panel-contact', z: -200, x: 0, y: 25, lookOffset: {x:0, y:5, z:-40} }   // Mirando al pico Contact (Z=-240)
-        ];
+        // Posición inicial: Alta y atrás para ver todo el panorama
+        camera.position.set(0, 60, 200);
+        camera.lookAt(0, 0, -500);
 
-        function moveCamera() {
+        function updateCameraScroll() {
+            // Mapear scroll HTML (0 a max) a coordenadas Z del mundo (200 a -1500)
             const scrollY = window.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const scrollPercent = scrollY / maxScroll; // 0 a 1
+            const progress = scrollY / maxScroll; // 0 a 1
 
-            // Interpolación entre puntos
-            const segmentSize = 1 / (flightPath.length - 1);
-            let currentIndex = Math.floor(scrollPercent / segmentSize);
-            if (currentIndex >= flightPath.length - 1) currentIndex = flightPath.length - 2;
+            // Definimos el rango de vuelo
+            const startZ = 200;
+            const endZ = -1600;
             
-            const nextIndex = currentIndex + 1;
-            const segmentProgress = (scrollPercent - (currentIndex * segmentSize)) / segmentSize;
-
-            const p1 = flightPath[currentIndex];
-            const p2 = flightPath[nextIndex];
-
-            // Posición Cámara
-            camera.position.x = p1.x + (p2.x - p1.x) * segmentProgress;
-            camera.position.y = p1.y + (p2.y - p1.y) * segmentProgress;
-            camera.position.z = p1.z + (p2.z - p1.z) * segmentProgress;
-
-            // LookAt Dinámico (Miramos siempre un poco adelante)
-            // Interpolamos el offset de mirada
-            const offX = p1.lookOffset.x + (p2.lookOffset.x - p1.lookOffset.x) * segmentProgress;
-            const offY = p1.lookOffset.y + (p2.lookOffset.y - p1.lookOffset.y) * segmentProgress;
-            const offZ = p1.lookOffset.z + (p2.lookOffset.z - p1.lookOffset.z) * segmentProgress;
-
-            camera.lookAt(
-                camera.position.x + offX, 
-                camera.position.y + offY, 
-                camera.position.z + offZ
-            );
-
-            // ACTIVAR PANELES
-            // Si estamos cerca de un punto clave ("parada"), mostramos panel
-            // Zona activa: +/- 15% del centro del segmento
-            const pointProgress = scrollPercent * (flightPath.length - 1); // 0, 1, 2, 3...
-            const closestPoint = Math.round(pointProgress);
-            const dist = Math.abs(pointProgress - closestPoint);
-
-            // Ocultar todos
-            document.querySelectorAll('.info-panel').forEach(p => p.classList.remove('active'));
+            const currentZ = startZ + (endZ - startZ) * progress;
             
-            if (dist < 0.25) { // Si estamos cerca del waypoint
-                const panelId = flightPath[closestPoint].id;
-                document.getElementById(panelId).classList.add('active');
-            }
+            // Posición de la cámara
+            camera.position.z = currentZ;
+            
+            // Altura dinámica: Alta al principio, baja cuando entramos en el terreno
+            // Si Z > 0 (Inicio), altura 60. Si Z < 0, altura 30.
+            let targetY = 30;
+            if (currentZ > 0) targetY = 60 - (30 * (1 - (currentZ/200))); // Transición suave
+            
+            // Seguir el terreno (Opcional, hace que suba si hay montaña debajo)
+            // Simplificado: Oscilación suave + Base
+            camera.position.y = targetY + Math.sin(currentZ * 0.01) * 2;
+            
+            // Movimiento lateral (X) suave para dar sensación de vuelo curvo
+            camera.position.x = Math.sin(currentZ * 0.002) * 20;
+
+            // LookAt: Siempre mirando adelante
+            camera.lookAt(camera.position.x * 0.5, 10, currentZ - 200);
+
+            checkProximity(currentZ);
         }
 
+        // --- 5. LOGICA DE PANELES (Proximidad) ---
+        function checkProximity(camZ) {
+            // Si no estamos clicando (scroll manual), verificar distancia a picos
+            // Ocultar home si bajamos
+            if (window.scrollY > 100) document.getElementById('panel-home').classList.remove('active');
+            else document.getElementById('panel-home').classList.add('active');
+
+            peaks.forEach(p => {
+                if (!p.label) return;
+                const panel = document.getElementById(p.id);
+                // Distancia Z
+                const dist = Math.abs(camZ - (p.z + 50)); // +50 offset para parar ANTES del cartel
+                
+                if (dist < 80) { // Si estamos a menos de 80 unidades
+                    panel.classList.add('active');
+                } else {
+                    // No ocultamos automáticamente si el usuario lo abrió manualmente, 
+                    // pero para simplificar flujo de scroll, sí:
+                    // panel.classList.remove('active'); 
+                    // (Opcional: Dejamos que el usuario cierre con la X)
+                }
+            });
+        }
+
+        function closePanel() {
+            document.querySelectorAll('.info-panel').forEach(p => p.classList.remove('active'));
+        }
+
+
+        // --- 6. INTERACCIÓN (RAYCASTER - CLIC EN MONTAÑAS) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('click', (event) => {
+            // Convertir ratón a coordenadas normalizadas (-1 a +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // Ver si chocamos con algún cartel
+            const intersects = raycaster.intersectObjects(interactables);
+
+            if (intersects.length > 0) {
+                const target = intersects[0].object;
+                const targetZ = target.userData.scrollZ;
+                
+                // Calcular cuánto scroll corresponde a esa Z
+                // startZ = 200, endZ = -1600. Total range = 1800.
+                // Formula inversa del updateCameraScroll
+                const totalDist = 1800;
+                const distFromStart = 200 - (targetZ + 60); // +60 para parar un poco antes
+                const scrollPercent = distFromStart / totalDist;
+                
+                const maxScroll = document.body.scrollHeight - window.innerHeight;
+                const scrollToPixel = scrollPercent * maxScroll;
+
+                // Animar scroll con GSAP
+                gsap.to(window, {duration: 2, scrollTo: scrollToPixel, ease: "power2.inOut"});
+                
+                // Abrir panel correspondiente
+                closePanel();
+                setTimeout(() => {
+                   document.getElementById(target.userData.targetId).classList.add('active'); 
+                }, 1500);
+            }
+        });
+
+
+        // --- 7. ANIMATION LOOP ---
         function animate() {
             requestAnimationFrame(animate);
-            // Efecto de viento/velocidad en la malla (ondulando suavemente)
-            const time = Date.now() * 0.001;
-            // No modificamos vértices cada frame por rendimiento, 
-            // pero podríamos rotar un poco las nubes o partículas si las hubiera.
+            // Vibración malla
+            plane.geometry.attributes.position.needsUpdate = true;
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('scroll', moveCamera);
+        window.addEventListener('scroll', updateCameraScroll);
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            moveCamera();
+            updateCameraScroll();
         });
 
-        // Init
-        moveCamera();
         animate();
+        updateCameraScroll(); // Init pos
 
     </script>
 </body>
