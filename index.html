@@ -3,36 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Ruiz Rodas - PES Portfolio</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>David Ruiz Rodas - Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #020204;       
-            --card-bg: rgba(11, 14, 23, 0.85); /* Más oscuro y opaco para leer mejor */
+            --bg-dark: #050505;       
+            --card-bg: rgba(15, 23, 42, 0.90); /* Fondo oscuro al 90% para máxima legibilidad */
             --text-main: #ffffff;     
-            --text-muted: #cbd5e1;    
-            --accent: #00f2ff;        /* Cyan eléctrico */
-            --accent-green: #00ff9d;  /* Verde neón para Fortran/Bash */
-            --accent-yellow: #ffea00; /* Amarillo para Python */
-            --accent-red: #ff4040;    /* Rojo para C */
+            --text-muted: #94a3b8;    
+            --accent: #06b6d4;        /* Cyan profesional (Cyan-500) */
+            --accent-glow: rgba(6, 182, 212, 0.4);
         }
 
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            font-weight: 500; /* Letra base más gruesa */
+            line-height: 1.6;
         }
 
-        /* LIENZO 3D (FONDO) */
+        /* FONDO 3D */
         #canvas-container {
             position: fixed;
             top: 0;
@@ -40,273 +38,197 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #101426 0%, #000000 100%);
+            background: radial-gradient(circle at center, #0f172a 0%, #000000 100%);
         }
 
         /* NAVEGACIÓN LATERAL */
         .nav-dock {
             position: fixed;
-            right: 20px;
+            right: 25px;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 15px 8px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
         }
 
         .nav-btn {
-            width: 14px;
-            height: 14px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
             border: 2px solid transparent;
         }
 
         .nav-btn:hover, .nav-btn.active {
             background: var(--accent);
-            transform: scale(1.4);
-            box-shadow: 0 0 12px var(--accent);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px var(--accent);
         }
 
+        /* Tooltips del menú */
         .nav-btn::before {
             content: attr(data-label);
             position: absolute;
-            right: 35px;
+            right: 25px;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0,0,0,0.9);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-family: 'JetBrains Mono';
-            font-weight: bold;
-            font-size: 0.8rem;
-            color: var(--accent);
+            background: rgba(0,0,0,0.8);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #fff;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
             white-space: nowrap;
-            border: 1px solid var(--accent);
         }
         .nav-btn:hover::before { opacity: 1; }
 
-        /* CONTENIDO PRINCIPAL */
+        /* CONTENEDOR */
         .main-content {
-            max-width: 950px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 25px;
+            padding: 0 20px;
         }
 
         section, header {
-            min-height: 85vh;
+            min-height: 90vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding-top: 40px;
+            padding-top: 60px;
         }
 
-        /* TIPOGRAFÍA REFORZADA */
+        /* TITULOS */
         h1 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 4.5rem; /* Más grande */
+            font-family: 'Inter', sans-serif;
+            font-size: 4rem;
             font-weight: 800;
             margin: 0;
-            color: #fff;
-            text-shadow: 0 4px 15px rgba(0, 242, 255, 0.4);
-            line-height: 1.1;
+            letter-spacing: -2px;
+            background: linear-gradient(to right, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .role {
-            font-family: 'JetBrains Mono';
+            font-family: 'JetBrains Mono', monospace;
             color: var(--accent);
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.25rem;
             margin-top: 15px;
-            background: rgba(0, 242, 255, 0.1);
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 4px;
+            font-weight: 500;
         }
 
         h2 {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--accent);
-            font-size: 2.2rem;
-            margin-bottom: 40px;
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #fff;
             display: flex;
             align-items: center;
-            font-weight: 700;
         }
         
         h2::after {
             content: "";
             flex: 1;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent), transparent);
+            height: 1px;
+            background: rgba(255,255,255,0.2);
             margin-left: 20px;
         }
 
-        /* TARJETAS GLASS (Mejoradas para lectura) */
+        /* TARJETAS (CARDS) */
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
             padding: 40px;
-            border-radius: 16px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             transition: transform 0.3s;
-            position: relative;
-            z-index: 2;
         }
 
-        /* Sombra de texto para todo lo que va dentro de las tarjetas */
-        .glass-card p, .glass-card li, .glass-card div {
-            text-shadow: 0 1px 1px rgba(0,0,0,0.8);
-        }
-
-        .glass-card:hover { 
-            transform: translateY(-5px); 
-            border-color: var(--accent); 
-        }
+        .glass-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }
 
         .item-header {
-            display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px;
         }
-        .item-title { font-weight: 800; font-size: 1.4rem; color: #fff; }
-        .item-place { color: var(--accent); font-family: 'JetBrains Mono'; font-weight: 600; font-size: 1rem;}
-        .item-date { font-family: 'JetBrains Mono'; color: #94a3b8; font-weight: bold; background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 6px;}
+        
+        .item-title { font-weight: 700; font-size: 1.25rem; color: #fff; }
+        .item-place { color: var(--accent); font-weight: 500; font-size: 1rem; margin-bottom: 10px; display: block;}
+        .item-date { font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--text-muted); }
 
-        /* --- NUEVO DISEÑO DE SKILLS (HEXÁGONOS) --- */
-        .hex-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-            justify-content: flex-start;
+        /* --- NUEVAS BARRAS DE SKILLS (PROFESSIONAL STYLE) --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
             margin-bottom: 40px;
         }
 
-        .hex-wrapper {
-            width: 130px;
-            height: 145px;
-            position: relative;
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-            transition: transform 0.3s;
+        .skill-item { margin-bottom: 20px; }
+
+        .skill-text {
+            display: flex; justify-content: space-between;
+            margin-bottom: 8px; font-size: 0.95rem; font-weight: 600; color: #e2e8f0;
         }
 
-        .hex-wrapper:hover { transform: scale(1.1); z-index: 10; }
+        .skill-bar-bg {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
-        .hex {
-            width: 100%;
+        .skill-bar-fill {
             height: 100%;
-            background: #111827; /* Fondo del hexágono */
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: absolute;
-            top: 0; left: 0;
-        }
-
-        /* Borde simulado del hexágono */
-        .hex::before {
-            content: '';
-            position: absolute;
-            top: 2px; left: 2px; right: 2px; bottom: 2px;
-            background: #1e293b; /* Color interior más claro */
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            z-index: -1;
-        }
-        
-        /* Borde exterior de color dinámico */
-        .hex-border {
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: var(--accent); /* Por defecto */
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            z-index: -2;
-        }
-
-        .hex-lang {
-            font-family: 'JetBrains Mono';
-            font-weight: 800;
-            color: #fff;
-            font-size: 1rem;
-            margin-bottom: 5px;
-        }
-
-        .hex-level {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--accent);
-        }
-        
-        .hex-bar {
-            width: 40px;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            margin-top: 5px;
-            border-radius: 2px;
+            background: linear-gradient(90deg, var(--accent), #3b82f6); /* Gradiente Cyan a Azul */
+            border-radius: 4px;
             position: relative;
         }
-        .hex-bar-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
+        
+        /* Brillo sutil en la barra */
+        .skill-bar-fill::after {
+            content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
         }
 
-        /* Colores específicos para hexágonos */
-        .h-fortran .hex-border, .h-fortran .hex-level, .h-fortran .hex-bar-fill { background: var(--accent-green); color: var(--accent-green); }
-        .h-bash .hex-border, .h-bash .hex-level, .h-bash .hex-bar-fill { background: var(--accent-green); color: var(--accent-green); }
-        .h-python .hex-border, .h-python .hex-level, .h-python .hex-bar-fill { background: var(--accent-yellow); color: var(--accent-yellow); }
-        .h-c .hex-border, .h-c .hex-level, .h-c .hex-bar-fill { background: var(--accent-red); color: var(--accent-red); }
-
-        /* Etiquestas software */
-        .tags { display: flex; flex-wrap: wrap; gap: 12px; list-style: none; padding: 0; }
+        /* TAGS PARA SOFTWARE */
+        .tags { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; }
         .tags li {
-            border: 2px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.4);
-            color: #e2e8f0;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-family: 'JetBrains Mono';
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
             transition: 0.2s;
         }
-        .tags li:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+        .tags li:hover { border-color: var(--accent); color: #fff; background: rgba(6, 182, 212, 0.1); }
 
-        /* FOOTER */
-        footer { text-align: center; padding-bottom: 80px; padding-top: 50px;}
-        .profile-pic { width: 130px; height: 130px; border-radius: 50%; border: 4px solid var(--accent); object-fit: cover; margin-bottom: 25px; box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); }
+        /* CONTACTO / FOOTER */
+        footer { text-align: center; padding-bottom: 100px; }
+        .profile-pic { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 25px; }
+        
         .contact-btn {
-            background: var(--accent); color: #000; font-weight: 800; padding: 18px 50px; border-radius: 50px; text-decoration: none; display: inline-block; font-size: 1.1rem; transition: 0.3s;
+            background: var(--accent); color: #0f172a; font-weight: 700; padding: 14px 35px; border-radius: 8px; text-decoration: none; display: inline-block; transition: 0.3s;
         }
-        .contact-btn:hover { box-shadow: 0 0 35px var(--accent); transform: scale(1.05); }
+        .contact-btn:hover { background: #fff; transform: translateY(-2px); }
 
-        .social-bar { margin-top: 30px; display: flex; gap: 20px; }
+        .social-bar { margin-top: 25px; display: flex; gap: 15px; }
         .social-icon { 
-            color: #fff; text-decoration: none; font-size: 1rem; font-weight: 600;
-            border: 2px solid #334155; padding: 10px 20px; border-radius: 8px; transition: 0.3s; background: rgba(0,0,0,0.6);
+            color: #cbd5e1; text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; transition: 0.3s;
         }
-        .social-icon:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        .social-icon:hover { border-color: var(--accent); color: var(--accent); background: rgba(6, 182, 212, 0.05); }
 
         @media (max-width: 768px) {
-            h1 { font-size: 3rem; }
+            h1 { font-size: 2.8rem; }
             .nav-dock { display: none; }
-            .hex-grid { justify-content: center; }
         }
     </style>
 </head>
@@ -315,24 +237,21 @@
     <div id="canvas-container"></div>
 
     <nav class="nav-dock">
-        <a href="#home" class="nav-btn active" data-label="Reactants"></a>
-        <a href="#education" class="nav-btn" data-label="Path"></a>
-        <a href="#experience" class="nav-btn" data-label="Transition State"></a>
-        <a href="#skills" class="nav-btn" data-label="Parameters"></a>
-        <a href="#contact" class="nav-btn" data-label="Products"></a>
+        <a href="#home" class="nav-btn active" data-label="Home"></a>
+        <a href="#education" class="nav-btn" data-label="Education"></a>
+        <a href="#experience" class="nav-btn" data-label="Experience"></a>
+        <a href="#skills" class="nav-btn" data-label="Skills"></a>
+        <a href="#contact" class="nav-btn" data-label="Contact"></a>
     </nav>
 
     <div class="main-content">
         
         <header id="home">
             <h1>David Ruiz Rodas</h1>
-            <div class="role">~/Computational_Chemist</div>
-            <p style="font-size: 1.25rem; font-weight: 600; color: #e2e8f0; max-width: 700px; margin-top: 30px; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
-                Specialized in <strong>Quantum Mechanics</strong>, Machine Learning Potentials & Spectroscopy.
-                <br><br>
-                <em style="color: var(--accent); font-family: 'JetBrains Mono'; font-size: 0.95rem;">
-                    "Nature isn't classical, dammit... make it quantum mechanical." — R. Feynman
-                </em>
+            <div class="role">Computational Chemist</div>
+            <p style="font-size: 1.15rem; color: #cbd5e1; max-width: 650px; margin-top: 25px; line-height: 1.7;">
+                Specialized in <strong>Theoretical Chemistry</strong> and <strong>Machine Learning Potentials</strong>. 
+                Focusing on the intersection of quantum mechanics and computational efficiency to solve complex chemical problems.
             </p>
             <div class="social-bar">
                 <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="social-icon">LinkedIn</a>
@@ -341,15 +260,15 @@
         </header>
 
         <section id="education">
-            <h2>01. Reaction Coordinates</h2>
+            <h2>Education</h2>
             
             <div class="glass-card">
                 <div class="item-header">
-                    <div class="item-title">MSc Theoretical Chemistry & Modeling</div>
+                    <div class="item-title">MSc Theoretical Chemistry & Computational Modeling</div>
                     <div class="item-date">2024 - Present</div>
                 </div>
-                <div class="item-place">Universidad Autónoma de Madrid</div>
-                <div style="margin-top: 15px; font-weight: 700; color: #a5b4fc;">&gt; Status: In Progress</div>
+                <div class="item-place">Universidad Autónoma de Madrid (UAM)</div>
+                <div style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">Status: In Progress</div>
             </div>
 
             <div class="glass-card">
@@ -357,8 +276,8 @@
                     <div class="item-title">BSc in Chemistry</div>
                     <div class="item-date">2020 - 2024</div>
                 </div>
-                <div class="item-place">Universidad Autónoma de Madrid</div>
-                <p style="margin-top: 15px; font-size: 1.05rem;">
+                <div class="item-place">Universidad Autónoma de Madrid (UAM)</div>
+                <p style="margin-top: 15px; font-size: 0.95rem; color: #cbd5e1;">
                     <strong>Average Grade:</strong> 6.82 / 10 <br>
                     <strong>Credits:</strong> 240
                 </p>
@@ -366,19 +285,23 @@
         </section>
 
         <section id="experience">
-            <h2>02. Energy Barriers</h2>
+            <h2>Experience</h2>
             
             <div class="glass-card">
                 <div class="item-header">
                     <div class="item-title">Undergraduate Researcher (TFG)</div>
                     <div class="item-date">2024</div>
                 </div>
-                <div class="item-place">Institute of Fundamental Physics (IFF-CSIC)</div>
-                <p style="font-size: 1.1rem; line-height: 1.7; margin-top: 15px;">
-                    Research on <strong>Noble Gas Spectroscopy</strong>. Conducted quantum computations and developed kernel-based machine learned potentials.
+                <span class="item-place">Institute of Fundamental Physics (IFF-CSIC)</span>
+                
+                <p style="color: #cbd5e1; margin-top: 15px;">
+                    Research focused on <strong>Noble Gas Spectroscopy</strong>. 
+                    Main responsibilities included running quantum computations and developing kernel-based machine learned potentials for molecular analysis.
                 </p>
-                <div style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.4); border-left: 4px solid var(--accent); font-size: 0.95rem; border-radius: 0 8px 8px 0;">
-                    <strong style="color:var(--accent)">Publication (In Prep):</strong> "Spectroscopic characterization of proton-bound Kr2H+ molecule"
+                
+                <div style="margin-top: 20px; padding: 12px; background: rgba(6, 182, 212, 0.1); border-radius: 6px; font-size: 0.9rem; border: 1px solid rgba(6, 182, 212, 0.2);">
+                    <strong style="color:#fff">Publication (In Preparation):</strong><br> 
+                    "Spectroscopic characterization of proton-bound Kr2H+ molecule"
                 </div>
             </div>
 
@@ -387,81 +310,70 @@
                     <div class="item-title">STEM Private Tutor</div>
                     <div class="item-date">2020 - Present</div>
                 </div>
-                <p>Teaching Mathematics, Physics, and Chemistry (ESO/Bachillerato).</p>
+                <span class="item-place">Freelance</span>
+                <p style="color: #cbd5e1; margin-top: 10px;">Teaching Mathematics, Physics, and Chemistry for High School levels (ESO/Bachillerato).</p>
             </div>
         </section>
 
         <section id="skills">
-            <h2>03. Input Parameters</h2>
+            <h2>Technical Skills</h2>
             
-            <h3 style="color: #fff; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 10px;">Programming Proficiency</h3>
-            
-            <div class="hex-grid">
-                
-                <div class="hex-wrapper h-fortran">
-                    <div class="hex-border"></div>
-                    <div class="hex">
-                        <div class="hex-lang">FORTRAN</div>
-                        <div class="hex-level">4/5</div>
-                        <div class="hex-bar"><div class="hex-bar-fill" style="width: 80%"></div></div>
-                    </div>
-                </div>
-
-                <div class="hex-wrapper h-bash">
-                    <div class="hex-border"></div>
-                    <div class="hex">
-                        <div class="hex-lang">BASH</div>
-                        <div class="hex-level">4/5</div>
-                        <div class="hex-bar"><div class="hex-bar-fill" style="width: 80%"></div></div>
-                    </div>
-                </div>
-
-                <div class="hex-wrapper h-python">
-                    <div class="hex-border"></div>
-                    <div class="hex">
-                        <div class="hex-lang">PYTHON</div>
-                        <div class="hex-level">3/5</div>
-                        <div class="hex-bar"><div class="hex-bar-fill" style="width: 60%"></div></div>
-                    </div>
-                </div>
-
-                <div class="hex-wrapper h-c">
-                    <div class="hex-border"></div>
-                    <div class="hex">
-                        <div class="hex-lang">C</div>
-                        <div class="hex-level">1/5</div>
-                        <div class="hex-bar"><div class="hex-bar-fill" style="width: 20%"></div></div>
-                    </div>
-                </div>
-
-            </div>
-
             <div class="glass-card">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+                <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 25px;">Programming Languages</h3>
+                
+                <div class="skills-grid">
                     <div>
-                        <h3 style="margin-top: 0; color: var(--accent);">Software Stack</h3>
+                        <div class="skill-item">
+                            <div class="skill-text"><span>Fortran</span> <span>Advanced</span></div>
+                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%;"></div></div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-text"><span>Bash / Shell Scripting</span> <span>Advanced</span></div>
+                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%;"></div></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="skill-item">
+                            <div class="skill-text"><span>Python</span> <span>Intermediate</span></div>
+                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 65%;"></div></div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-text"><span>C</span> <span>Basic</span></div>
+                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 25%;"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
+                    <div>
+                        <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 15px;">Software & Simulation</h3>
                         <ul class="tags">
                             <li>Gaussian</li> <li>Orca</li> <li>Molpro</li>
                             <li>Spartan</li> <li>Molden</li>
                         </ul>
                     </div>
                     <div>
-                        <h3 style="margin-top: 0; color: var(--accent);">Data & Tools</h3>
+                        <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 15px;">Tools & Data</h3>
                         <ul class="tags">
                             <li>LaTeX</li> <li>Gnuplot</li> <li>OriginLab</li> <li>Git</li>
                         </ul>
                     </div>
                 </div>
             </div>
-            
-            <div style="margin-top: 40px;">
-                <h3 style="color: #fff; font-family: 'JetBrains Mono'; margin-bottom: 20px;">Seminars & Learning</h3>
-                <ul style="color: #e2e8f0; list-style: none; padding: 0; font-size: 1.05rem;">
-                    <li style="margin-bottom: 15px; padding-left: 20px; border-left: 2px solid #555;">
-                        <strong>Big data in quantum astrochemistry</strong> (UAM, 2024)
+
+            <div class="glass-card">
+                <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                    Seminars & Learning
+                </h3>
+                <ul style="list-style: none; padding: 0; color: #cbd5e1;">
+                    <li style="margin-bottom: 15px;">
+                        <strong style="color: #fff;">Big data in quantum astrochemistry</strong> <br>
+                        <span style="font-size: 0.9rem; color: var(--accent);">Universidad Autónoma de Madrid (2024)</span>
                     </li>
-                    <li style="padding-left: 20px; border-left: 2px solid #555;">
-                        <strong>Complex organic molecules in ISM</strong> (IFF-CSIC, 2024)
+                    <li>
+                        <strong style="color: #fff;">Complex organic molecules in ISM</strong> <br>
+                        <span style="font-size: 0.9rem; color: var(--accent);">IFF-CSIC (2024)</span>
                     </li>
                 </ul>
             </div>
@@ -469,18 +381,19 @@
 
         <footer id="contact">
             <img src="profile.jpg" alt="David" class="profile-pic">
-            <h2 style="border: none; margin-bottom: 20px; justify-content: center;">Equilibrium Reached</h2>
-            <p style="color: #cbd5e1; margin-bottom: 40px; font-size: 1.1rem;">
-                Ready to optimize your research?
+            <h2 style="justify-content: center; border: none;">Get In Touch</h2>
+            <p style="color: #cbd5e1; margin-bottom: 30px;">
+                I am available for research collaborations and new projects.
             </p>
-            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Initialize Contact</a>
+            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Contact Me</a>
         </footer>
 
     </div>
 
     <script>
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000000, 0.003); // Niebla negra más densa para contraste
+        // Niebla negra para fundir el horizonte
+        scene.fog = new THREE.FogExp2(0x000000, 0.002); 
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -488,8 +401,9 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // --- PES CONFIG ---
-        const geometry = new THREE.PlaneGeometry(220, 1000, 90, 250);
+        // --- PES CONFIGURATION ---
+        // Aumentamos tamaño para cubrir todo el scroll
+        const geometry = new THREE.PlaneGeometry(220, 1200, 80, 250);
         const count = geometry.attributes.position.count;
         const positions = geometry.attributes.position;
         const colors = [];
@@ -499,16 +413,19 @@
             const x = positions.getX(i);
             const y = positions.getY(i);
             
-            // Ecuación PES (ondas más suaves para no distraer)
-            let z = (Math.sin(x * 0.04) * Math.cos(y * 0.04) * 10) + 
-                    (Math.sin(x * 0.08 + y * 0.08) * 5);
+            // PES Equation: Valles y picos suaves
+            let z = (Math.sin(x * 0.03) * Math.cos(y * 0.03) * 12) + 
+                    (Math.sin(x * 0.08 + y * 0.05) * 4);
             
             positions.setZ(i, z);
 
-            // Heatmap: Azul (valles) -> Rojo (picos)
-            const minZ = -15; const maxZ = 15;
+            // Heatmap Científico: Azul (Deep) -> Rojo (High Energy)
+            const minZ = -16; const maxZ = 16;
             let t = (z - minZ) / (maxZ - minZ);
-            color.setHSL(0.65 - (t * 0.65), 1.0, 0.5); // 0.65 es azul, 0 es rojo
+            
+            // Usamos un gradiente más "científico" (Blue -> Cyan -> Green -> Yellow)
+            // HSL: 0.6 (Azul) -> 0.1 (Amarillo/Rojo)
+            color.setHSL(0.6 - (t * 0.5), 0.9, 0.5); 
             colors.push(color.r, color.g, color.b);
         }
         
@@ -519,24 +436,26 @@
             vertexColors: true, 
             wireframe: true,
             transparent: true,
-            opacity: 0.35 // Opacidad controlada para no molestar al texto
+            opacity: 0.35 // Sutil para no molestar la lectura
         });
 
         const plane = new THREE.Mesh(geometry, material);
         plane.rotation.x = -Math.PI / 2; 
-        plane.position.z = -100; 
+        plane.position.z = -100; // Empezamos un poco atrás
         scene.add(plane);
 
-        camera.position.set(0, 30, 100);
+        camera.position.set(0, 40, 100);
 
-        // --- SCROLL LOGIC ---
+        // --- SCROLL & NAV LOGIC ---
         function moveCamera() {
             const scrollY = window.scrollY;
-            // Ajustamos velocidad de avance
-            camera.position.z = 100 - (scrollY * 0.2); 
-            // Movimiento suave en Y para seguir el terreno
-            camera.position.y = 30 + Math.sin(scrollY * 0.002) * 5;
             
+            // Movemos la cámara a lo largo del eje Z según el scroll
+            camera.position.z = 100 - (scrollY * 0.25); 
+            
+            // Ligero movimiento en Y para simular vuelo sobre el terreno
+            camera.position.y = 40 + Math.sin(scrollY * 0.001) * 5;
+
             updateActiveNav();
         }
 
@@ -562,8 +481,8 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            // Vibración molecular lenta
-            plane.position.x = Math.sin(Date.now() * 0.0003) * 3;
+            // Animación lenta (vibración molecular / evolución del sistema)
+            plane.position.x = Math.sin(Date.now() * 0.0002) * 4;
             renderer.render(scene, camera);
         }
 
