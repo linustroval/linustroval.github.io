@@ -3,481 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Ruiz Rodas - Portfolio</title>
+    <title>David Ruiz Rodas - Reaction Map</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
             --bg-dark: #050505;       
-            --card-bg: rgba(15, 23, 42, 0.85); /* Fondo oscuro semitransparente */
+            --card-bg: rgba(10, 15, 30, 0.85);
             --text-main: #ffffff;     
             --text-muted: #94a3b8;    
-            --accent: #06b6d4;        /* Cyan profesional */
+            --accent: #06b6d4;
             --accent-glow: rgba(6, 182, 212, 0.4);
         }
 
-        html { scroll-behavior: smooth; }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
-            line-height: 1.6;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Ocultar scroll horizontal */
         }
 
-        /* FONDO 3D */
+        /* LIENZO 3D */
         #canvas-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             background: radial-gradient(circle at center, #0f172a 0%, #000000 100%);
         }
 
-        /* NAVEGACIÓN LATERAL */
-        .nav-dock {
-            position: fixed;
-            right: 25px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        /* ETIQUETAS FLOTANTES EN EL MUNDO 3D (TITULOS DE MONTAÑA) */
+        .world-label {
+            position: absolute;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            color: var(--accent);
+            background: rgba(0,0,0,0.6);
+            padding: 8px 15px;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            pointer-events: auto; /* Para poder hacer click */
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .world-label:hover {
+            background: var(--accent);
+            color: #000;
+            transform: translate(-50%, -50%) scale(1.1);
             z-index: 100;
         }
 
-        .nav-btn {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+        /* CONTENEDOR DE SCROLL "FANTASMA" */
+        /* Hacemos la página muy larga para tener espacio de scroll, 
+           pero el contenido real está fijo y aparece/desaparece */
+        #scroll-dummy {
+            height: 5000px; /* Longitud del viaje */
         }
 
-        .nav-btn:hover, .nav-btn.active {
-            background: var(--accent);
-            transform: scale(1.3);
-            box-shadow: 0 0 10px var(--accent);
-        }
-
-        .nav-btn::before {
-            content: attr(data-label);
-            position: absolute;
-            right: 25px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0,0,0,0.8);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            color: #fff;
+        /* PANELES DE INFORMACIÓN (Los que aparecen al llegar) */
+        .info-panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%; max-width: 850px;
+            max-height: 80vh;
+            overflow-y: auto; /* Scroll interno si el texto es muy largo */
             opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            white-space: nowrap;
-        }
-        .nav-btn:hover::before { opacity: 1; }
-
-        /* CONTENEDOR */
-        .main-content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px;
+            pointer-events: none; /* No molestar cuando invisibles */
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            z-index: 10;
         }
 
-        section, header {
-            min-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-top: 60px;
+        .info-panel.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
         }
 
-        /* --- NUEVA CABECERA (HERO CARD) --- */
-        .hero-card {
-            background: rgba(10, 15, 30, 0.75); /* Un poco más transparente que el resto */
+        /* ESTILOS DE LAS TARJETAS (Glass) */
+        .glass-card {
+            background: var(--card-bg);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(6, 182, 212, 0.3); /* Borde sutil cyan */
-            padding: 60px 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px;
             border-radius: 20px;
-            text-align: center; /* Todo centrado */
-            box-shadow: 0 0 50px rgba(6, 182, 212, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
+        /* ESTILOS HERO (INICIO) */
+        .hero-panel {
+            text-align: center;
+        }
+        
         h1 {
-            font-family: 'Inter', sans-serif;
-            font-size: 4rem;
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: -2px;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+            font-size: 4.5rem; font-weight: 800; margin: 0;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
         }
-
-        .role {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--accent);
-            font-size: 1.4rem;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-
-        /* La Cita de Feynman */
+        .role { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 1.5rem; margin-top: 10px; }
         .quote {
-            margin: 25px auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-style: italic;
-            color: #cbd5e1;
-            max-width: 700px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 15px 0;
+            margin: 25px auto; font-family: 'JetBrains Mono'; font-style: italic; color: #cbd5e1;
+            border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 0; max-width: 700px;
         }
         .quote span { color: var(--accent); font-weight: bold; font-style: normal; }
 
-        .hero-text {
-            font-size: 1.1rem;
-            color: #94a3b8;
-            max-width: 700px;
-            margin: 0 auto 30px auto;
-            line-height: 1.6;
-        }
-
-        /* BOTONES HERO GRANDES */
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
+        /* BOTONES HERO */
+        .hero-buttons { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
         .hero-btn {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.2);
-            color: #fff;
-            text-decoration: none;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 12px 35px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2);
+            color: #fff; text-decoration: none; font-family: 'JetBrains Mono'; font-weight: 600;
+            padding: 12px 30px; border-radius: 8px; transition: 0.3s;
         }
+        .hero-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(6, 182, 212, 0.1); }
 
-        .hero-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(6, 182, 212, 0.1);
-            transform: translateY(-3px);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
-        }
-
-        /* SECCIONES Y TARJETAS ESTÁNDAR */
-        h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-        }
+        /* ESTILOS GENERALES CONTENIDO */
+        h2 { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-top: 0; }
+        .item-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .item-title { font-weight: 700; font-size: 1.2rem; color: #fff; }
+        .item-place { color: var(--accent); font-weight: 500; }
+        .item-date { font-family: 'JetBrains Mono'; color: #94a3b8; font-size: 0.9rem; }
         
-        h2::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.2);
-            margin-left: 20px;
-        }
-
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 40px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            transition: transform 0.3s;
-        }
-
-        .glass-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }
-
-        .item-header {
-            display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px;
-        }
-        
-        .item-title { font-weight: 700; font-size: 1.25rem; color: #fff; }
-        .item-place { color: var(--accent); font-weight: 500; font-size: 1rem; margin-bottom: 10px; display: block;}
-        .item-date { font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--text-muted); }
-
         /* SKILLS BARS */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .skill-item { margin-bottom: 20px; }
-        .skill-text { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; font-weight: 600; color: #e2e8f0; }
-        .skill-bar-bg { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-        .skill-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #3b82f6);
-            border-radius: 4px;
-            position: relative;
-        }
-        .skill-bar-fill::after {
-            content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        }
+        .skill-item { margin-bottom: 15px; }
+        .skill-text { display: flex; justify-content: space-between; color: #e2e8f0; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; }
+        .skill-bg { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .skill-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #3b82f6); border-radius: 4px; }
 
         /* TAGS */
-        .tags { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; }
-        .tags li {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #cbd5e1;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .tags li:hover { border-color: var(--accent); color: #fff; background: rgba(6, 182, 212, 0.1); }
-
-        /* FOOTER */
-        footer { text-align: center; padding-bottom: 100px; }
-        .profile-pic { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 25px; }
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; }
+        .tags li { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; }
         
-        .contact-btn {
-            background: var(--accent); color: #0f172a; font-weight: 700; padding: 14px 35px; border-radius: 8px; text-decoration: none; display: inline-block; transition: 0.3s;
+        /* INDICADOR DE SCROLL */
+        .scroll-indicator {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            color: var(--text-muted); font-family: 'JetBrains Mono'; font-size: 0.8rem;
+            animation: bounce 2s infinite; opacity: 0.7; z-index: 20;
         }
-        .contact-btn:hover { background: #fff; transform: translateY(-2px); }
+        @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
 
-        @media (max-width: 768px) {
-            h1 { font-size: 2.8rem; }
-            .hero-card { padding: 30px 20px; }
-            .nav-dock { display: none; }
-        }
+        /* FOOTER ESTILO */
+        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 20px; }
+        .contact-btn { background: var(--accent); color: #000; font-weight: 700; padding: 12px 30px; border-radius: 30px; text-decoration: none; display: inline-block; transition: 0.3s; margin-top: 20px;}
+        .contact-btn:hover { box-shadow: 0 0 20px var(--accent); transform: scale(1.05); }
+
     </style>
 </head>
 <body>
 
     <div id="canvas-container"></div>
+    
+    <div id="labels-container"></div>
 
-    <nav class="nav-dock">
-        <a href="#home" class="nav-btn active" data-label="Home"></a>
-        <a href="#education" class="nav-btn" data-label="Education"></a>
-        <a href="#experience" class="nav-btn" data-label="Experience"></a>
-        <a href="#skills" class="nav-btn" data-label="Skills"></a>
-        <a href="#contact" class="nav-btn" data-label="Contact"></a>
-    </nav>
+    <div id="scroll-dummy"></div>
 
-    <div class="main-content">
-        
-        <header id="home">
-            <div class="hero-card">
-                <h1>David Ruiz Rodas</h1>
-                <div class="role">Computational Chemist</div>
-                
-                <div class="quote">
-                    "Nature isn't classical, dammit, and if you want to make a simulation of nature, you'd better make it quantum mechanical."
-                    <br><span>— Richard Feynman</span>
-                </div>
+    <div class="scroll-indicator">SCROLL TO EXPLORE THE MAP ↓</div>
 
-                <p class="hero-text">
-                    Specialized in <strong>Theoretical Chemistry</strong> and <strong>Machine Learning Potentials</strong>. 
-                    Merging quantum mechanics with modern code to solve complex chemical problems.
-                </p>
-
-                <div class="hero-buttons">
-                    <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="hero-btn">
-                        🔗 LinkedIn
-                    </a>
-                    <a href="https://github.com/linustroval" target="_blank" class="hero-btn">
-                        💻 GitHub
-                    </a>
-                </div>
-            </div>
-        </header>
-
-        <section id="education">
-            <h2>Education</h2>
+    <div class="info-panel active" id="panel-home">
+        <div class="glass-card hero-panel">
+            <h1>David Ruiz Rodas</h1>
+            <div class="role">Computational Chemist</div>
             
-            <div class="glass-card">
-                <div class="item-header">
-                    <div class="item-title">MSc Theoretical Chemistry & Computational Modeling</div>
-                    <div class="item-date">2024 - Present</div>
-                </div>
-                <div class="item-place">Universidad Autónoma de Madrid (UAM)</div>
-                <div style="margin-top: 15px; font-size: 0.9rem; color: var(--accent);">Status: In Progress</div>
+            <div class="quote">
+                "Nature isn't classical, dammit, and if you want to make a simulation of nature, you'd better make it quantum mechanical."
+                <br><span>— Richard Feynman</span>
             </div>
 
-            <div class="glass-card">
-                <div class="item-header">
-                    <div class="item-title">BSc in Chemistry</div>
-                    <div class="item-date">2020 - 2024</div>
-                </div>
-                <div class="item-place">Universidad Autónoma de Madrid (UAM)</div>
-                <p style="margin-top: 15px; font-size: 0.95rem; color: #cbd5e1;">
-                    <strong>Average Grade:</strong> 6.82 / 10 <br>
-                    <strong>Credits:</strong> 240
-                </p>
-            </div>
-        </section>
-
-        <section id="experience">
-            <h2>Experience</h2>
-            
-            <div class="glass-card">
-                <div class="item-header">
-                    <div class="item-title">Undergraduate Researcher (TFG)</div>
-                    <div class="item-date">2024</div>
-                </div>
-                <span class="item-place">Institute of Fundamental Physics (IFF-CSIC)</span>
-                
-                <p style="color: #cbd5e1; margin-top: 15px;">
-                    Research focused on <strong>Noble Gas Spectroscopy</strong>. 
-                    Main responsibilities included running quantum computations and developing kernel-based machine learned potentials.
-                </p>
-                
-                <div style="margin-top: 20px; padding: 12px; background: rgba(6, 182, 212, 0.1); border-radius: 6px; font-size: 0.9rem; border: 1px solid rgba(6, 182, 212, 0.2);">
-                    <strong style="color:#fff">Publication (In Preparation):</strong><br> 
-                    "Spectroscopic characterization of proton-bound Kr2H+ molecule"
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <div class="item-header">
-                    <div class="item-title">STEM Private Tutor</div>
-                    <div class="item-date">2020 - Present</div>
-                </div>
-                <span class="item-place">Freelance</span>
-                <p style="color: #cbd5e1; margin-top: 10px;">Teaching Mathematics, Physics, and Chemistry for High School levels.</p>
-            </div>
-        </section>
-
-        <section id="skills">
-            <h2>Technical Skills</h2>
-            
-            <div class="glass-card">
-                <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 25px;">Programming Languages</h3>
-                
-                <div class="skills-grid">
-                    <div>
-                        <div class="skill-item">
-                            <div class="skill-text"><span>Fortran</span> <span>Advanced</span></div>
-                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 85%;"></div></div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-text"><span>Bash / Shell Scripting</span> <span>Advanced</span></div>
-                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 80%;"></div></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="skill-item">
-                            <div class="skill-text"><span>Python</span> <span>Intermediate</span></div>
-                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 65%;"></div></div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-text"><span>C</span> <span>Basic</span></div>
-                            <div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 25%;"></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
-                    <div>
-                        <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 15px;">Software & Simulation</h3>
-                        <ul class="tags">
-                            <li>Gaussian</li> <li>Orca</li> <li>Molpro</li>
-                            <li>Spartan</li> <li>Molden</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 15px;">Tools & Data</h3>
-                        <ul class="tags">
-                            <li>LaTeX</li> <li>Gnuplot</li> <li>OriginLab</li> <li>Git</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                    Seminars & Learning
-                </h3>
-                <ul style="list-style: none; padding: 0; color: #cbd5e1;">
-                    <li style="margin-bottom: 15px;">
-                        <strong style="color: #fff;">Big data in quantum astrochemistry</strong> <br>
-                        <span style="font-size: 0.9rem; color: var(--accent);">Universidad Autónoma de Madrid (2024)</span>
-                    </li>
-                    <li>
-                        <strong style="color: #fff;">Complex organic molecules in ISM</strong> <br>
-                        <span style="font-size: 0.9rem; color: var(--accent);">IFF-CSIC (2024)</span>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <footer id="contact">
-            <img src="profile.jpg" alt="David" class="profile-pic">
-            <h2 style="justify-content: center; border: none;">Get In Touch</h2>
-            <p style="color: #cbd5e1; margin-bottom: 30px;">
-                I am available for research collaborations and new projects.
+            <p style="color: #cbd5e1; font-size: 1.1rem; margin-bottom: 30px;">
+                Navigate through the <strong>Potential Energy Surface</strong> of my professional career.
+                <br><span style="font-size: 0.9rem; color: var(--accent);">(Scroll down or click the mountain peaks)</span>
             </p>
-            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Contact Me</a>
-        </footer>
 
+            <div class="hero-buttons">
+                <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="hero-btn">LinkedIn</a>
+                <a href="https://github.com/linustroval" target="_blank" class="hero-btn">GitHub</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="panel-education">
+        <div class="glass-card">
+            <h2>01. Education Peak</h2>
+            <div class="item-header">
+                <div class="item-title">MSc Theoretical Chemistry & Modeling</div>
+                <div class="item-date">2024 - Present</div>
+            </div>
+            <div class="item-place">Universidad Autónoma de Madrid</div>
+            <div style="margin-bottom: 20px; font-size: 0.9rem; color: var(--accent);">Status: In Progress</div>
+
+            <div class="item-header">
+                <div class="item-title">BSc in Chemistry</div>
+                <div class="item-date">2020 - 2024</div>
+            </div>
+            <div class="item-place">Universidad Autónoma de Madrid</div>
+            <p style="color: #cbd5e1; font-size: 0.9rem;">
+                Average Grade: 6.82 / 10 | Credits: 240
+            </p>
+        </div>
+    </div>
+
+    <div class="info-panel" id="panel-experience">
+        <div class="glass-card">
+            <h2>02. Experience Range</h2>
+            <div class="item-header">
+                <div class="item-title">Undergraduate Researcher (TFG)</div>
+                <div class="item-date">2024</div>
+            </div>
+            <div class="item-place">IFF-CSIC</div>
+            <p style="color: #cbd5e1; margin-top: 10px;">
+                Research on <strong>Noble Gas Spectroscopy</strong>. Developed kernel-based machine learned potentials.
+            </p>
+            <div style="background: rgba(6, 182, 212, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid var(--accent); margin-bottom: 20px;">
+                <strong style="color:#fff">Publication (In Prep):</strong> "Spectroscopic characterization of proton-bound Kr2H+ molecule"
+            </div>
+
+            <div class="item-header">
+                <div class="item-title">STEM Private Tutor</div>
+                <div class="item-date">2020 - Present</div>
+            </div>
+            <div class="item-place">Freelance</div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="panel-skills">
+        <div class="glass-card">
+            <h2>03. Skills Valley</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="font-size: 1rem; color: #fff; margin-bottom: 15px;">Languages</h3>
+                    <div class="skill-item">
+                        <div class="skill-text"><span>Fortran</span><span>Adv</span></div>
+                        <div class="skill-bg"><div class="skill-fill" style="width: 85%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-text"><span>Bash</span><span>Adv</span></div>
+                        <div class="skill-bg"><div class="skill-fill" style="width: 80%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-text"><span>Python</span><span>Int</span></div>
+                        <div class="skill-bg"><div class="skill-fill" style="width: 65%"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-text"><span>C</span><span>Basic</span></div>
+                        <div class="skill-bg"><div class="skill-fill" style="width: 25%"></div></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size: 1rem; color: #fff; margin-bottom: 15px;">Software & Learning</h3>
+                    <ul class="tags">
+                        <li>Gaussian</li> <li>Orca</li> <li>Molpro</li> <li>Spartan</li> <li>LaTeX</li> <li>Gnuplot</li>
+                    </ul>
+                    <h3 style="font-size: 1rem; color: #fff; margin-top: 20px; margin-bottom: 15px;">Seminars</h3>
+                    <ul style="font-size: 0.85rem; padding-left: 15px; color: #cbd5e1;">
+                        <li>Big data in quantum astrochemistry (2024)</li>
+                        <li>Complex organic molecules in ISM (2024)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="panel-contact">
+        <div class="glass-card" style="text-align: center;">
+            <img src="profile.jpg" alt="David" class="profile-pic">
+            <h2>Final Destination</h2>
+            <p style="color: #cbd5e1; margin-bottom: 20px;">
+                Ready to optimize calculations and collaborate?
+            </p>
+            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Initialize Contact</a>
+        </div>
     </div>
 
     <script>
+        // CONFIGURACIÓN THREE.JS
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000000, 0.002); 
+        scene.fog = new THREE.FogExp2(0x000000, 0.003); // Niebla negra
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // --- PES CONFIGURATION ---
-        const geometry = new THREE.PlaneGeometry(220, 1200, 80, 250);
+        // --- CREAR PES (SUPERFICIE) ---
+        const geometry = new THREE.PlaneGeometry(300, 300, 100, 100);
         const count = geometry.attributes.position.count;
         const positions = geometry.attributes.position;
         const colors = [];
         const color = new THREE.Color();
 
+        // Creamos montañas específicas en coordenadas clave
         for (let i = 0; i < count; i++) {
             const x = positions.getX(i);
-            const y = positions.getY(i);
+            const y = positions.getY(i); // En PlaneGeometry y es "arriba" 2D, luego lo rotamos
             
-            // PES Equation: Valles y picos suaves
-            let z = (Math.sin(x * 0.03) * Math.cos(y * 0.03) * 12) + 
-                    (Math.sin(x * 0.08 + y * 0.05) * 4);
+            // Base Wavy
+            let z = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 5;
+
+            // Montaña Education (Top Left)
+            if (x < -20 && y > 20) z += 15 * Math.exp(-((x+50)**2 + (y-50)**2)/500);
             
+            // Montaña Experience (Top Right)
+            if (x > 20 && y > 20) z += 12 * Math.exp(-((x-50)**2 + (y-50)**2)/600);
+
+            // Montaña Skills (Bottom Left)
+            if (x < -20 && y < -20) z += 14 * Math.exp(-((x+40)**2 + (y+40)**2)/400);
+
+            // Montaña Contact (Bottom Right)
+            if (x > 20 && y < -20) z += 10 * Math.exp(-((x-40)**2 + (y+40)**2)/500);
+
             positions.setZ(i, z);
 
-            // Heatmap Científico
-            const minZ = -16; const maxZ = 16;
-            let t = (z - minZ) / (maxZ - minZ);
-            
-            // HSL: Blue -> Cyan -> Green -> Yellow
-            color.setHSL(0.6 - (t * 0.5), 0.9, 0.5); 
+            // Colores por altura
+            const t = (z + 5) / 25; 
+            color.setHSL(0.6 - (t * 0.5), 0.9, 0.5);
             colors.push(color.r, color.g, color.b);
         }
         
@@ -485,61 +331,149 @@
         geometry.computeVertexNormals();
 
         const material = new THREE.MeshBasicMaterial({ 
-            vertexColors: true, 
-            wireframe: true,
-            transparent: true,
-            opacity: 0.35 
+            vertexColors: true, wireframe: true, transparent: true, opacity: 0.4 
         });
 
         const plane = new THREE.Mesh(geometry, material);
         plane.rotation.x = -Math.PI / 2; 
-        plane.position.z = -100; 
         scene.add(plane);
 
-        camera.position.set(0, 40, 100);
+        // --- CONFIGURACIÓN DE PUNTOS DE RUTA (WAYPOINTS) ---
+        // Definimos dónde debe estar la cámara para cada sección
+        // Coordenadas aproximadas basadas en las montañas creadas arriba
+        const waypoints = [
+            { id: 'panel-home', pos: {x: 0, y: 80, z: 0}, lookAt: {x: 0, y: 0, z: 0} }, // Vista satélite
+            { id: 'panel-education', pos: {x: -30, y: 20, z: -30}, lookAt: {x: -50, y: 0, z: -50} }, // Education
+            { id: 'panel-experience', pos: {x: 30, y: 20, z: -30}, lookAt: {x: 50, y: 0, z: -50} }, // Experience
+            { id: 'panel-skills', pos: {x: -25, y: 15, z: 50}, lookAt: {x: -40, y: 0, z: 40} }, // Skills
+            { id: 'panel-contact', pos: {x: 25, y: 15, z: 50}, lookAt: {x: 40, y: 0, z: -40} } // Contact
+        ];
 
-        // --- SCROLL LOGIC ---
-        function moveCamera() {
+        // Etiquetas 3D (Coordenadas en el mundo)
+        const labelsData = [
+            { text: "EDUCATION", x: -50, y: 15, z: -50, target: 1 }, // target = index in waypoints
+            { text: "EXPERIENCE", x: 50, y: 12, z: -50, target: 2 },
+            { text: "SKILLS", x: -40, y: 14, z: 40, target: 3 },
+            { text: "CONTACT", x: 40, y: 10, z: -40, target: 4 }
+        ];
+
+        // Crear elementos DOM para las etiquetas
+        const labelsContainer = document.getElementById('labels-container');
+        const domLabels = [];
+
+        labelsData.forEach(data => {
+            const el = document.createElement('div');
+            el.className = 'world-label';
+            el.innerText = data.text;
+            // Al hacer click, hacemos scroll hasta ese punto
+            el.onclick = () => {
+                const totalHeight = document.body.scrollHeight - window.innerHeight;
+                const targetScroll = (data.target / (waypoints.length - 1)) * totalHeight;
+                window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+            };
+            labelsContainer.appendChild(el);
+            domLabels.push({ el: el, pos: new THREE.Vector3(data.x, data.y, data.z) });
+        });
+
+        // --- LÓGICA DE MOVIMIENTO ---
+        function updateCamera() {
             const scrollY = window.scrollY;
-            camera.position.z = 100 - (scrollY * 0.25); 
-            camera.position.y = 40 + Math.sin(scrollY * 0.001) * 5;
-            updateActiveNav();
-        }
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollPercent = scrollY / maxScroll; // 0 a 1
 
-        function updateActiveNav() {
-            const sections = document.querySelectorAll('section, header, footer');
-            const navBtns = document.querySelectorAll('.nav-btn');
+            // Encontrar entre qué waypoints estamos
+            // Tenemos 5 puntos, así que 4 segmentos (0-0.25, 0.25-0.50, etc)
+            const segmentSize = 1 / (waypoints.length - 1);
+            let currentIndex = Math.floor(scrollPercent / segmentSize);
             
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (window.scrollY >= (sectionTop - 400)) {
-                    current = section.getAttribute('id');
-                }
-            });
+            if (currentIndex >= waypoints.length - 1) currentIndex = waypoints.length - 2;
+            
+            const nextIndex = currentIndex + 1;
+            
+            // Calcular progreso dentro del segmento actual (0 a 1)
+            const segmentProgress = (scrollPercent - (currentIndex * segmentSize)) / segmentSize;
 
-            navBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('href').includes(current)) {
-                    btn.classList.add('active');
+            // Interpolar Posición
+            const p1 = waypoints[currentIndex].pos;
+            const p2 = waypoints[nextIndex].pos;
+            
+            camera.position.x = p1.x + (p2.x - p1.x) * segmentProgress;
+            camera.position.y = p1.y + (p2.y - p1.y) * segmentProgress;
+            camera.position.z = p1.z + (p2.z - p1.z) * segmentProgress;
+
+            // Interpolar LookAt (hacia dónde mira)
+            const l1 = waypoints[currentIndex].lookAt;
+            const l2 = waypoints[nextIndex].lookAt;
+            
+            const currentLookX = l1.x + (l2.x - l1.x) * segmentProgress;
+            const currentLookY = l1.y + (l2.y - l1.y) * segmentProgress;
+            const currentLookZ = l1.z + (l2.z - l1.z) * segmentProgress;
+            
+            camera.lookAt(currentLookX, currentLookY, currentLookZ);
+
+            // --- MOSTRAR/OCULTAR PANELES ---
+            // Mostramos el panel del waypoint más cercano
+            // Si estamos muy cerca de un waypoint (ej: +/- 0.15 del centro del waypoint)
+            const waypointCenter = currentIndex * segmentSize;
+            const distToCurrent = Math.abs(scrollPercent - waypointCenter);
+            const distToNext = Math.abs(scrollPercent - (nextIndex * segmentSize));
+
+            // Resetear todos
+            document.querySelectorAll('.info-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector('.scroll-indicator').style.opacity = (scrollPercent > 0.05) ? 0 : 0.7;
+
+            // Determinar cuál mostrar
+            let activePanelId = null;
+            if (distToCurrent < 0.1) activePanelId = waypoints[currentIndex].id;
+            else if (distToNext < 0.1) activePanelId = waypoints[nextIndex].id;
+
+            if (activePanelId) {
+                document.getElementById(activePanelId).classList.add('active');
+            }
+
+            // --- ACTUALIZAR POSICIÓN DE ETIQUETAS 3D EN PANTALLA ---
+            domLabels.forEach(lbl => {
+                // Proyectar coordenadas 3D a 2D
+                const vector = lbl.pos.clone();
+                vector.project(camera);
+
+                const x = (vector.x * .5 + .5) * window.innerWidth;
+                const y = (-(vector.y * .5) + .5) * window.innerHeight;
+
+                // Solo mostrar si está delante de la cámara
+                if (vector.z < 1) {
+                    lbl.el.style.left = `${x}px`;
+                    lbl.el.style.top = `${y}px`;
+                    lbl.el.style.display = 'block';
+                    
+                    // Efecto de desvanecimiento si la cámara se acerca mucho
+                    const dist = camera.position.distanceTo(lbl.pos);
+                    lbl.el.style.opacity = Math.min(1, (dist - 10) / 30); // Se oculta si está a < 10 unidades
+                } else {
+                    lbl.el.style.display = 'none';
                 }
             });
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            plane.position.x = Math.sin(Date.now() * 0.0002) * 4;
+            // Vibración suave
+            plane.position.y = Math.sin(Date.now() * 0.0005) * 1; 
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('scroll', moveCamera);
+        window.addEventListener('scroll', updateCamera);
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            updateCamera(); // Recalcular pos etiquetas
         });
 
+        // Inicio
         animate();
+        updateCamera();
+
     </script>
 </body>
 </html>
