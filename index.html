@@ -315,6 +315,9 @@
         scene.add(wirePlane);
 
         // --- LABELS ---
+        // Keep references to update orientation (billboard) each frame.
+        const labels = [];
+
         function createLabel(text, x, y, z) {
             const canvas = document.createElement('canvas');
             canvas.width = 500; canvas.height = 120;
@@ -335,20 +338,24 @@
                 new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthTest: false })
             );
             
-            // Posicionamiento Ajustado: Siempre visible arriba del pico
-            const h = y > 0 ? y + 40 : 30; 
-            mesh.position.set(x, h, z);
+            // Posicionamiento Ajustado: cerca del punto real (montaña o pozo) con un offset pequeño.
+            // Antes, los pozos se forzaban a y=30, quedando muy lejos.
+            const offset = y >= 0 ? 22 : 18;
+            const labelY = Math.max(12, y + offset);
+            mesh.position.set(x, labelY, z);
             // Render order para que el texto siempre se vea encima
             mesh.renderOrder = 999;
             scene.add(mesh);
 
             // Linea indicadora
             const lineGeo = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(x, h-7, z), 
+                new THREE.Vector3(x, labelY - 5, z),
                 new THREE.Vector3(x, y, z)
             ]);
             const line = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 }));
             scene.add(line);
+
+            labels.push({ mesh, line, x, y, z, labelY });
         }
 
         peaks.forEach(p => {
@@ -445,6 +452,10 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            // Billboard: keep labels facing the camera so they look "bien situadas".
+            labels.forEach(({ mesh }) => {
+                mesh.lookAt(camera.position);
+            });
             renderer.render(scene, camera);
         }
 
