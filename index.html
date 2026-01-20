@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV de [Tu Nombre]</title>
+    <title>[Your Name] - Resume</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILOS (El diseño visual) --- */
+        /* --- STYLES (Visual Design) --- */
         :root {
-            --color-primario: #2563eb; /* Azul moderno */
-            --color-texto: #334155;    /* Gris oscuro para leer bien */
-            --color-fondo: #f8fafc;    /* Gris muy clarito de fondo */
+            --primary-color: #2563eb; /* Modern Blue */
+            --text-color: #334155;    /* Dark Gray for readability */
+            --bg-color: #f8fafc;      /* Light Gray background */
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--color-fondo);
-            color: var(--color-texto);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             line-height: 1.6;
         }
 
-        .contenedor {
+        .container {
             max-width: 800px;
             margin: 40px auto;
             background: white;
@@ -31,7 +31,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        /* Cabecera */
+        /* Header */
         header {
             text-align: center;
             border-bottom: 2px solid #e2e8f0;
@@ -45,43 +45,43 @@
             font-size: 2.5rem;
         }
 
-        .subtitulo {
-            color: var(--color-primario);
+        .subtitle {
+            color: var(--primary-color);
             font-size: 1.2rem;
             font-weight: 600;
             margin-top: 10px;
         }
 
-        /* Secciones */
+        /* Sections */
         section {
             margin-bottom: 30px;
         }
 
         h2 {
-            border-left: 5px solid var(--color-primario);
+            border-left: 5px solid var(--primary-color);
             padding-left: 10px;
             color: #1e293b;
             margin-bottom: 15px;
         }
 
-        /* Experiencia y Educación */
+        /* Experience & Education Items */
         .item {
             margin-bottom: 20px;
         }
         
-        .item-titulo {
+        .item-title {
             font-weight: bold;
             font-size: 1.1rem;
         }
         
-        .fecha {
+        .date {
             color: #64748b;
             font-size: 0.9rem;
             margin-bottom: 5px;
             display: block;
         }
 
-        /* Lista de Habilidades (Tags) */
+        /* Skills Tags */
         .skills {
             list-style: none;
             padding: 0;
@@ -99,10 +99,10 @@
             font-weight: 500;
         }
 
-        /* Contacto */
-        .contacto-btn {
+        /* Contact Button */
+        .contact-btn {
             display: inline-block;
-            background-color: var(--color-primario);
+            background-color: var(--primary-color);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -110,61 +110,61 @@
             margin-top: 10px;
         }
         
-        .contacto-btn:hover {
+        .contact-btn:hover {
             opacity: 0.9;
         }
 
-        /* Móvil */
+        /* Mobile Responsive */
         @media (max-width: 600px) {
-            .contenedor { margin: 10px; padding: 20px; }
+            .container { margin: 10px; padding: 20px; }
             h1 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="contenedor">
+    <div class="container">
         <header>
-            <h1>[TU NOMBRE AQUÍ]</h1>
-            <div class="subtitulo">Profesión o Título Principal</div>
-            <p>📍 Ciudad, País | 📧 tuemail@ejemplo.com</p>
+            <h1>[YOUR NAME HERE]</h1>
+            <div class="subtitle">Professional Title / Role</div>
+            <p>📍 City, Country | 📧 your.email@example.com</p>
         </header>
 
         <section>
-            <h2>Sobre mí</h2>
-            <p>Aquí escribes un breve resumen de quién eres. Soy un profesional apasionado por [Tu Sector] con experiencia en gestionar proyectos y resolver problemas. Me encanta aprender cosas nuevas como programar mi propia web.</p>
+            <h2>About Me</h2>
+            <p>Passionate professional with experience in [Your Industry]. Dedicated to efficient project management and creative problem-solving. Always eager to learn new technologies and improve workflows.</p>
         </section>
 
         <section>
-            <h2>Experiencia Laboral</h2>
+            <h2>Work Experience</h2>
             
             <div class="item">
-                <div class="item-titulo">Cargo o Puesto - Nombre de la Empresa</div>
-                <span class="fecha">Enero 2020 - Actualidad</span>
-                <p>Descripción de lo que hacías en este trabajo. Logros conseguidos y tareas principales.</p>
+                <div class="item-title">Job Position - Company Name</div>
+                <span class="date">January 2022 - Present</span>
+                <p>Brief description of your responsibilities and key achievements in this role. Focus on results and technologies used.</p>
             </div>
 
             <div class="item">
-                <div class="item-titulo">Cargo Anterior - Otra Empresa</div>
-                <span class="fecha">Marzo 2018 - Diciembre 2019</span>
-                <p>Descripción breve de tus funciones en este puesto anterior.</p>
+                <div class="item-title">Previous Position - Previous Company</div>
+                <span class="date">March 2019 - December 2021</span>
+                <p>Description of your tasks and contributions in this previous role.</p>
             </div>
         </section>
 
         <section>
-            <h2>Habilidades</h2>
+            <h2>Skills</h2>
             <ul class="skills">
                 <li>HTML & CSS</li>
-                <li>Trabajo en Equipo</li>
-                <li>Gestión de Tiempo</li>
-                <li>Excel Avanzado</li>
-                <li>Inglés (B2)</li>
+                <li>Project Management</li>
+                <li>Teamwork</li>
+                <li>Data Analysis</li>
+                <li>English (B2)</li>
             </ul>
         </section>
 
         <section style="text-align: center; margin-top: 50px;">
-            <p>¿Te interesa mi perfil?</p>
-            <a href="mailto:tuemail@ejemplo.com" class="contacto-btn">Contactar conmigo</a>
+            <p>Interested in my profile?</p>
+            <a href="mailto:your.email@example.com" class="contact-btn">Get in Touch</a>
         </section>
     </div>
 
