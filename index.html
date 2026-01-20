@@ -4,259 +4,276 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>David Ruiz Rodas - Computational Chemist</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Paleta Dark Scientific */
-            --bg-dark: #0f172a;       /* Azul muy oscuro, casi negro */
-            --card-bg: rgba(30, 41, 59, 0.7); /* Fondo semitransparente */
-            --text-main: #e2e8f0;     /* Blanco suave */
-            --text-muted: #94a3b8;    /* Gris azulado */
-            --accent: #38bdf8;        /* Cian eléctrico */
-            
-            /* Gradiente "Espectro" */
-            --spectrum-gradient: linear-gradient(90deg, #ef4444, #eab308, #22c55e, #3b82f6, #a855f7);
+            /* Paleta Dark Mode "Quantum" */
+            --bg-dark: #0a0f1c;       /* Casi negro, un azul muy muy oscuro */
+            --card-bg: #111827;       /* Gris oscuro azulado */
+            --text-main: #f1f5f9;     /* Blanco roto */
+            --text-muted: #94a3b8;    /* Gris metalizado */
+            --accent: #22d3ee;        /* Cian Eléctrico (Cyan-400) */
+            --accent-dim: rgba(34, 211, 238, 0.1); /* Cian transparente para fondos */
         }
 
         body {
-            font-family: 'Outfit', sans-serif; /* Fuente más moderna y geométrica */
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 20%);
             color: var(--text-main);
             margin: 0;
             line-height: 1.6;
             min-height: 100vh;
+            /* Un patrón de cuadrícula sutil muy "técnico" de fondo */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
         }
 
         .container {
             max-width: 900px;
             margin: 60px auto;
-            background: var(--card-bg);
-            backdrop-filter: blur(10px); /* Efecto cristal */
-            padding: 50px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* La barra superior de "Espectroscopía" */
-        .container::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--spectrum-gradient);
+            padding: 0 20px;
         }
 
         /* HEADER */
         header {
-            text-align: left;
-            margin-bottom: 50px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .header-content {
-            flex: 1;
+            margin-bottom: 60px;
+            border-left: 4px solid var(--accent);
+            padding-left: 30px;
+            position: relative;
         }
 
         h1 {
+            font-family: 'JetBrains Mono', monospace; /* Fuente estilo código */
             color: #fff;
             margin: 0;
             font-size: 3rem;
             letter-spacing: -1px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
-        .subtitle {
+        .quote {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 20px;
+            font-style: italic;
+            background: var(--card-bg);
+            display: inline-block;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            border-left: 2px solid var(--accent);
+        }
+
+        .quote span {
+            display: block;
+            margin-top: 10px;
             color: var(--accent);
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-top: 5px;
-            font-family: monospace; /* Toque "code" */
+            font-weight: bold;
+            font-style: normal;
+            font-size: 0.85rem;
+            text-align: right;
         }
 
-        /* SOCIAL LINKS (Top Right) */
+        /* SOCIAL LINKS */
         .social-links {
+            margin-top: 25px;
             display: flex;
             gap: 15px;
-            margin-top: 20px;
         }
 
         .social-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             text-decoration: none;
-            color: var(--text-main);
-            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            background: var(--card-bg);
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
         }
 
         .social-btn:hover {
-            background: rgba(56, 189, 248, 0.1);
             border-color: var(--accent);
             color: var(--accent);
+            background: var(--accent-dim);
             transform: translateY(-2px);
         }
 
         /* SECTIONS */
-        section { margin-bottom: 50px; }
+        section { margin-bottom: 60px; }
 
         h2 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 30px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            color: #fff;
-            margin-bottom: 30px;
-            font-size: 1.5rem;
         }
-
+        
         h2::after {
             content: "";
             flex: 1;
             height: 1px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(34, 211, 238, 0.2);
+            margin-left: 15px;
         }
 
-        /* ITEMS */
-        .item { 
-            margin-bottom: 30px; 
-            padding-left: 20px;
-            border-left: 2px solid rgba(255,255,255,0.1);
-            transition: border-color 0.3s;
+        /* CARDS (Education & Experience) */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
         }
 
-        .item:hover {
-            border-left-color: var(--accent);
+        .card:hover {
+            border-color: var(--accent);
         }
-        
-        .item-title {
-            font-weight: bold;
-            font-size: 1.2rem;
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
             color: #fff;
         }
 
-        .item-subtitle {
-            font-weight: 500;
+        .card-subtitle {
             color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        .card-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .grade-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* SKILLS BARS */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .skill-item {
+            margin-bottom: 15px;
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .progress-bg {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            position: relative;
         }
         
-        .date {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            display: block;
-            margin-bottom: 10px;
-            font-family: monospace;
+        /* Efecto de brillo en la barra */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: translateX(-100%);
+            animation: shine 2s infinite;
         }
 
-        /* SKILLS GRID */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        @keyframes shine {
+            100% { transform: translateX(100%); }
         }
 
-        .skill-group h3 {
-            font-size: 1rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 0;
-        }
-
-        .skills {
-            list-style: none;
-            padding: 0;
+        /* OTHER SKILLS TAGS */
+        .tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
         }
 
-        .skills li {
-            background-color: rgba(255,255,255,0.05);
-            color: var(--text-main);
-            border: 1px solid rgba(255,255,255,0.1);
+        .tags li {
+            background: var(--card-bg);
+            border: 1px solid var(--accent);
+            color: var(--accent);
             padding: 5px 12px;
             border-radius: 4px;
             font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .skills li.highlight {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(56, 189, 248, 0.1);
-        }
-
-        /* PUBLICATIONS BOX */
-        .pub-box {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        /* FOOTER & MINI PHOTO */
+        /* FOOTER */
         footer {
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            flex-direction: column;
+            margin-top: 80px;
+            padding-bottom: 40px;
             text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 40px;
         }
 
         .mini-profile {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             border: 2px solid var(--accent);
-            padding: 3px; /* Espacio entre foto y borde */
             object-fit: cover;
-            filter: grayscale(20%); /* Un toque artístico */
-            transition: filter 0.3s;
+            margin-bottom: 15px;
+            opacity: 0.9;
         }
-        
-        .mini-profile:hover { filter: grayscale(0%); }
 
-        .contact-btn {
-            background: var(--spectrum-gradient);
-            color: white;
-            padding: 12px 30px;
+        .contact-email {
+            color: var(--text-main);
             text-decoration: none;
-            border-radius: 30px; /* Botón redondeado moderno */
-            font-weight: 700;
-            transition: transform 0.3s;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            font-size: 1.1rem;
+            border-bottom: 1px dashed var(--accent);
+            padding-bottom: 2px;
         }
         
-        .contact-btn:hover { transform: scale(1.05); }
+        .contact-email:hover { color: var(--accent); border-style: solid; }
 
         @media (max-width: 600px) {
-            .container { margin: 0; border-radius: 0; padding: 25px; }
-            h1 { font-size: 2rem; }
-            header { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .social-links { width: 100%; justify-content: flex-start; }
+            h1 { font-size: 2.2rem; }
+            .quote { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -264,113 +281,124 @@
 
     <div class="container">
         <header>
-            <div class="header-content">
-                <h1>David Ruiz Rodas</h1>
-                <div class="subtitle">
-                    &lt;Chemist & Computational Researcher /&gt;
-                </div>
-                <p style="color: var(--text-muted); margin-top: 10px;">
-                    Specialized in noble gas spectroscopy & ML potentials
-                </p>
+            <h1>David Ruiz Rodas</h1>
+            <div style="color: var(--accent); font-family: 'JetBrains Mono'; margin-top: 5px;">
+                ~/Chemist/Computational_Researcher
+            </div>
+            
+            <div class="quote">
+                "Nature isn't classical, dammit, and if you want to make a simulation of nature, you'd better make it quantum mechanical."
+                <span>— Richard Feynman</span>
             </div>
 
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/david-ruiz-rodas-335914130/" target="_blank" class="social-btn">
-                    LinkedIn
+                    <span>LI</span> LinkedIn
                 </a>
                 <a href="https://github.com/linustroval" target="_blank" class="social-btn">
-                    GitHub
+                    <span>GH</span> GitHub
                 </a>
             </div>
         </header>
 
         <section>
-            <h2>About Me</h2>
-            <p>
-                Chemist specialized in Theoretical Chemistry and Computational Modeling (MSc at UAM). 
-                Passionate about bridging the gap between chemistry and code.
-                My work focuses on applying <strong>Machine Learning</strong> and <strong>Quantum Computations</strong> 
-                to solve complex problems in spectroscopy.
-            </p>
-        </section>
+            <h2>01. Education</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">MSc in Theoretical Chemistry and Computational Modeling</div>
+                        <div class="card-subtitle">Universidad Autónoma de Madrid</div>
+                    </div>
+                    <div class="card-date">2024 - Present</div>
+                </div>
+                <div class="grade-badge">Current GPA: In Progress</div>
+            </div>
 
-        <section>
-            <h2>Latest Research</h2>
-            <div class="pub-box">
-                <div style="color: var(--accent); font-size: 0.9rem; margin-bottom: 5px;">IN PREPARATION</div>
-                <strong>Spectroscopic characterization of proton-bound Kr2H+ molecule</strong><br>
-                <span style="color: var(--text-muted); font-size: 0.9rem;">
-                    Kernel-base machine learned potentials and quantum computations.
-                </span><br>
-                <em style="font-size: 0.85rem; opacity: 0.7;">Phys. Chem. Chem. Phys. (2024)</em>
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">BSc in Chemistry</div>
+                        <div class="card-subtitle">Universidad Autónoma de Madrid</div>
+                    </div>
+                    <div class="card-date">2020 - 2024</div>
+                </div>
+                <div class="grade-badge">Average Grade: 6.82 / 10</div>
+                <p style="font-size: 0.9rem; margin-top: 10px; color: #ccc;">
+                    Credits completed: 240. Focus on Physical Chemistry and Computation.
+                </p>
             </div>
         </section>
 
         <section>
-            <h2>Tech Stack</h2>
-            <div class="skills-grid">
-                <div class="skill-group">
-                    <h3>Programming</h3>
-                    <ul class="skills">
-                        <li class="highlight">Fortran</li>
-                        <li class="highlight">Python</li>
-                        <li>Bash</li>
-                        <li>C</li>
-                    </ul>
+            <h2>02. Experience</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Undergraduate Researcher (TFG)</div>
+                        <div class="card-subtitle">Institute of Fundamental Physics (IFF-CSIC)</div>
+                    </div>
+                    <div class="card-date">2024</div>
                 </div>
-                <div class="skill-group">
-                    <h3>Comp. Chemistry</h3>
-                    <ul class="skills">
+                <p>
+                    Research on <strong>noble gas spectroscopy</strong>. Conducted quantum computations and analysis using <strong>Machine Learning potentials</strong>.
+                </p>
+                <div style="margin-top: 10px; font-size: 0.9rem; color: var(--accent);">
+                    📄 Publication in prep: "Spectroscopic characterization of proton-bound Kr2H+ molecule"
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>03. Technical Stack</h2>
+            
+            <div class="skills-container">
+                <div>
+                    <h3 style="color:white; margin-bottom: 20px;">Programming Languages</h3>
+                    
+                    <div class="skill-item">
+                        <div class="skill-info"><span>Fortran</span> <span>4/5</span></div>
+                        <div class="progress-bg"><div class="progress-fill" style="width: 80%;"></div></div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info"><span>Bash / Shell</span> <span>4/5</span></div>
+                        <div class="progress-bg"><div class="progress-fill" style="width: 80%;"></div></div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info"><span>Python</span> <span>3/5</span></div>
+                        <div class="progress-bg"><div class="progress-fill" style="width: 60%;"></div></div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-info"><span>C</span> <span>1/5</span></div>
+                        <div class="progress-bg"><div class="progress-fill" style="width: 20%;"></div></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color:white; margin-bottom: 20px;">Software & Tools</h3>
+                    <ul class="tags">
                         <li>Gaussian</li>
                         <li>Orca</li>
                         <li>Molpro</li>
                         <li>Spartan</li>
-                    </ul>
-                </div>
-                <div class="skill-group">
-                    <h3>Tools</h3>
-                    <ul class="skills">
+                        <li>Molden</li>
                         <li>LaTeX</li>
                         <li>Gnuplot</li>
                         <li>Git</li>
-                        <li>Linux</li>
+                        <li>OriginLab</li>
                     </ul>
                 </div>
-            </div>
-        </section>
-
-        <section>
-            <h2>Experience & Education</h2>
-
-            <div class="item">
-                <div class="item-title">MSc in Theoretical Chemistry</div>
-                <div class="item-subtitle">Universidad Autónoma de Madrid</div>
-                <span class="date">2024 - Present</span>
-            </div>
-
-            <div class="item">
-                <div class="item-title">Undergraduate Researcher (TFG)</div>
-                <div class="item-subtitle">IFF-CSIC</div>
-                <span class="date">2024</span>
-                <p style="font-size: 0.95rem; color: #ccc;">
-                    Research on noble gas spectroscopy using Machine Learning potentials.
-                </p>
-            </div>
-
-            <div class="item">
-                <div class="item-title">BSc in Chemistry</div>
-                <div class="item-subtitle">Universidad Autónoma de Madrid</div>
-                <span class="date">2020 - 2024</span>
             </div>
         </section>
 
         <footer>
-            <img src="profile.jpg" alt="David Ruiz Rodas" class="mini-profile">
-            
-            <p style="margin: 0; color: var(--text-muted);">
-                Ready to collaborate on new research projects?
-            </p>
-            <a href="mailto:rrodasdavid@gmail.com" class="contact-btn">Contact Me</a>
+            <img src="profile.jpg" alt="David" class="mini-profile">
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Get in touch</p>
+            <a href="mailto:rrodasdavid@gmail.com" class="contact-email">rrodasdavid@gmail.com</a>
         </footer>
     </div>
 
